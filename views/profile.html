@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>flowAccount</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#07070f;
+  --bg2:#0d0d1a;
+  --bg3:#12121f;
+  --bg4:#17172a;
+  --blue:#00b4ff;
+  --blue-dim:rgba(0,180,255,0.12);
+  --blue-glow:rgba(0,180,255,0.25);
+  --text:#ffffff;
+  --sub:#8a91a8;
+  --sub2:#6b7289;
+  --border:rgba(255,255,255,0.07);
+  --border-hover:rgba(0,180,255,0.3);
+  --card-bg:rgba(17,17,32,0.9);
+  --radius:16px;
+  --radius-sm:10px;
+  --radius-lg:24px;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"DM Sans",sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── BANNER ── */
+.banner-wrap{
+  position:relative;
+  height:320px;
+  overflow:hidden;
+}
+
+.banner-wrap::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(7,7,15,0.6) 70%,
+    var(--bg) 100%
+  );
+  pointer-events:none;
+}
+
+#banner{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  filter:brightness(0.85);
+  transition:filter 0.4s;
+}
+
+.banner-default{
+  width:100%;
+  height:100%;
+  background:linear-gradient(135deg,#0d0d22 0%,#0a1929 40%,#071520 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.banner-mesh{
+  width:100%;
+  height:100%;
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 50%,rgba(0,90,180,0.35) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 30%,rgba(0,50,120,0.25) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 50% at 50% 80%,rgba(0,30,80,0.2) 0%,transparent 70%),
+    #07070f;
+}
+
+/* ── LAYOUT WRAPPER ── */
+.page{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 32px;
+}
+
+/* ── PROFILE HERO ── */
+.profile-hero{
+  position:relative;
+  margin-top:-100px;
+  z-index:10;
+  animation:fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.profile-card{
+  background:var(--card-bg);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:32px 36px;
+  display:flex;
+  gap:28px;
+  align-items:flex-start;
+  position:relative;
+  overflow:hidden;
+}
+
+.profile-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+  opacity:0.6;
+}
+
+/* ── AVATAR ── */
+.avatar-wrap{
+  position:relative;
+  flex-shrink:0;
+}
+
+.avatar{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  overflow:hidden;
+  background:var(--bg4);
+  position:relative;
+  flex-shrink:0;
+}
+
+.avatar::before{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),#0055ff,transparent);
+  z-index:-1;
+}
+
+.avatar-ring{
+  position:absolute;
+  inset:-4px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue) 0%,rgba(0,85,255,0.6) 50%,transparent 100%);
+  z-index:-1;
+}
+
+#avatar{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  border-radius:50%;
+  border:3px solid var(--bg);
+}
+
+/* ── PROFILE INFO ── */
+.profile-body{
+  flex:1;
+  min-width:0;
+}
+
+.profile-top-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.profile-identity{}
+
+.name{
+  font-size:30px;
+  font-weight:800;
+  font-family:Syne,sans-serif;
+  letter-spacing:-0.5px;
+  line-height:1.1;
+}
+
+.handle{
+  margin-top:6px;
+  color:var(--sub);
+  font-size:14px;
+  letter-spacing:0.3px;
+}
+
+.bio{
+  margin-top:16px;
+  font-size:14.5px;
+  line-height:1.7;
+  color:rgba(255,255,255,0.75);
+  max-width:620px;
+}
+
+/* ── STATS ── */
+.stats-row{
+  display:flex;
+  gap:0;
+  margin-top:24px;
+}
+
+.stat{
+  padding-right:32px;
+  margin-right:32px;
+  border-right:1px solid var(--border);
+  cursor:default;
+}
+
+.stat:last-child{
+  border-right:none;
+  margin-right:0;
+  padding-right:0;
+}
+
+.stat-value{
+  font-size:24px;
+  font-weight:800;
+  font-family:Syne,sans-serif;
+  letter-spacing:-0.5px;
+  line-height:1;
+  color:var(--text);
+  transition:color 0.2s;
+}
+
+.stat:hover .stat-value{color:var(--blue);}
+
+.stat-label{
+  margin-top:5px;
+  font-size:12px;
+  color:var(--sub2);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+}
+
+/* ── ACTIONS ── */
+.actions{
+  display:flex;
+  gap:12px;
+  flex-shrink:0;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:12px 24px;
+  border-radius:50px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  font-family:"DM Sans",sans-serif;
+  transition:all 0.2s ease;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+.flow{
+  background:linear-gradient(135deg,var(--blue) 0%,#0080e0 100%);
+  color:#000;
+  box-shadow:0 0 20px rgba(0,180,255,0.3);
+  position:relative;
+  overflow:hidden;
+}
+
+.flow::after{
+  content:'';
+  position:absolute;
+  top:-50%;left:-60%;
+  width:40%;height:200%;
+  background:rgba(255,255,255,0.15);
+  transform:skewX(-20deg);
+  transition:left 0.4s ease;
+}
+
+.flow:hover{
+  transform:translateY(-1px);
+  box-shadow:0 0 30px rgba(0,180,255,0.5);
+}
+
+.flow:hover::after{left:120%;}
+
+.flow:active{transform:translateY(0);}
+
+.edit{
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.edit:hover{
+  background:var(--blue-dim);
+  border-color:var(--border-hover);
+  transform:translateY(-1px);
+}
+
+/* ── TABS ── */
+.tabs-wrap{
+  margin-top:28px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+
+.tabs{
+  display:flex;
+  gap:0;
+}
+
+.tab{
+  padding:16px 24px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:14px;
+  color:var(--sub);
+  position:relative;
+  transition:color 0.2s;
+  letter-spacing:0.3px;
+}
+
+.tab::after{
+  content:'';
+  position:absolute;
+  bottom:-1px;left:50%;right:50%;
+  height:2px;
+  background:var(--blue);
+  border-radius:2px 2px 0 0;
+  transition:left 0.25s ease,right 0.25s ease;
+}
+
+.tab.active{color:var(--text);}
+
+.tab.active::after{left:0;right:0;}
+
+.tab:hover:not(.active){color:rgba(255,255,255,0.6);}
+
+/* ── VIDEO GRID ── */
+#videoGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:20px;
+  padding:28px 0 60px;
+  animation:fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+.video{
+  background:var(--bg3);
+  border-radius:var(--radius);
+  overflow:hidden;
+  cursor:pointer;
+  border:1px solid var(--border);
+  transition:transform 0.22s ease,box-shadow 0.22s ease,border-color 0.22s ease;
+  position:relative;
+}
+
+.video:hover{
+  transform:translateY(-5px);
+  box-shadow:0 16px 40px rgba(0,0,0,0.5),0 0 0 1px var(--border-hover);
+  border-color:var(--border-hover);
+}
+
+.video-thumb{
+  position:relative;
+  overflow:hidden;
+  background:#0a0a18;
+}
+
+.video img{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  display:block;
+  transition:transform 0.35s ease;
+}
+
+.video:hover img{transform:scale(1.04);}
+
+.video-thumb-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 50%);
+  opacity:0;
+  transition:opacity 0.25s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.video:hover .video-thumb-overlay{opacity:1;}
+
+.play-icon{
+  width:48px;height:48px;
+  background:rgba(0,180,255,0.9);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+  transform:scale(0.8);
+  transition:transform 0.2s;
+}
+
+.video:hover .play-icon{transform:scale(1);}
+
+.play-icon svg{margin-left:3px;}
+
+.video-duration{
+  position:absolute;
+  bottom:10px;right:10px;
+  background:rgba(0,0,0,0.75);
+  color:white;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 7px;
+  border-radius:5px;
+  backdrop-filter:blur(4px);
+}
+
+.video-info{
+  padding:14px 16px 16px;
+}
+
+.video-title{
+  font-weight:700;
+  font-size:14px;
+  line-height:1.4;
+  color:var(--text);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.video-meta{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--sub2);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.video-meta-dot{
+  width:3px;height:3px;
+  background:var(--sub2);
+  border-radius:50%;
+}
+
+.video-accent{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--blue),#0055ff);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.3s ease;
+}
+
+.video:hover .video-accent{transform:scaleX(1);}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;
+  padding:80px 20px;
+  color:var(--sub2);
+}
+
+.empty-state svg{margin-bottom:20px;opacity:0.3;}
+.empty-state h3{font-size:18px;margin-bottom:8px;color:var(--sub);}
+.empty-state p{font-size:14px;}
+
+/* ── ABOUT PAGE ── */
+.aboutPage{
+  display:none;
+  padding:28px 0 60px;
+  animation:fadeIn 0.3s ease both;
+}
+
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.aboutCard{
+  background:var(--bg3);
+  padding:28px;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  grid-column:span 2;
+}
+
+.aboutTitle{
+  font-size:16px;
+  font-weight:800;
+  font-family:Syne,sans-serif;
+  margin-bottom:20px;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.aboutTitle::before{
+  content:'';
+  display:block;
+  width:3px;height:18px;
+  background:var(--blue);
+  border-radius:2px;
+}
+
+.about-items{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.aboutItem{}
+
+.aboutLabel{
+  color:var(--sub2);
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.aboutValue{
+  margin-top:6px;
+  font-size:15px;
+  color:var(--text);
+  line-height:1.5;
+}
+
+/* ── MODAL ── */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  align-items:center;
+  justify-content:center;
+  z-index:500;
+  backdrop-filter:blur(6px);
+  padding:20px;
+  animation:fadeIn 0.2s ease;
+}
+
+.modal.show{display:flex;}
+
+.modal-box{
+  background:#0f0f1e;
+  width:480px;
+  max-width:100%;
+  padding:32px;
+  border-radius:var(--radius-lg);
+  border:1px solid rgba(0,180,255,0.2);
+  box-shadow:0 0 60px rgba(0,0,0,0.6),0 0 0 1px var(--border);
+  animation:slideUp 0.25s ease;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.modal-box h2{
+  margin-bottom:24px;
+  font-family:Syne,sans-serif;
+  font-size:20px;
+}
+
+.modal-box label{
+  display:block;
+  margin-top:18px;
+  margin-bottom:7px;
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  color:var(--sub);
+}
+
+.modal-box input,
+.modal-box textarea{
+  width:100%;
+  background:#1a1a2e;
+  border:1px solid var(--border);
+  color:white;
+  padding:13px 16px;
+  border-radius:var(--radius-sm);
+  font-family:"DM Sans",sans-serif;
+  font-size:14px;
+  transition:border-color 0.2s;
+  outline:none;
+}
+
+.modal-box input:focus,
+.modal-box textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px var(--blue-dim);
+}
+
+.modal-box textarea{
+  height:110px;
+  resize:none;
+}
+
+.modal-box input[type="file"]{
+  padding:10px 12px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.modal-buttons{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  margin-top:28px;
+}
+
+.modal-buttons button{
+  padding:12px 24px;
+  border:none;
+  border-radius:50px;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  font-family:"DM Sans",sans-serif;
+  transition:all 0.2s;
+}
+
+.modal-buttons button:first-child{
+  background:linear-gradient(135deg,var(--blue),#0080e0);
+  color:#000;
+  box-shadow:0 0 20px rgba(0,180,255,0.3);
+}
+
+.modal-buttons button:first-child:hover{
+  transform:translateY(-1px);
+  box-shadow:0 0 30px rgba(0,180,255,0.5);
+}
+
+.modal-buttons button:last-child{
+  background:var(--bg4);
+  color:var(--sub);
+  border:1px solid var(--border);
+}
+
+.modal-buttons button:last-child:hover{
+  color:white;
+  border-color:var(--border-hover);
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .page{padding:0 20px;}
+  .banner-wrap{height:220px;}
+  .profile-hero{margin-top:-60px;}
+  .profile-card{flex-direction:column;gap:20px;padding:24px;}
+  .profile-top-row{gap:16px;}
+  .avatar{width:100px;height:100px;}
+  .name{font-size:24px;}
+  .stats-row{gap:0;}
+  .stat{padding-right:24px;margin-right:24px;}
+  .stat-value{font-size:20px;}
+  .about-items{grid-template-columns:1fr;}
+  .about-grid{grid-template-columns:1fr;}
+  .aboutCard{grid-column:span 1;}
+}
+
+@media(max-width:600px){
+  .banner-wrap{height:180px;}
+  .profile-hero{margin-top:-50px;}
+  .profile-card{padding:20px;}
+  .avatar{width:84px;height:84px;}
+  .name{font-size:21px;}
+  .bio{font-size:13.5px;}
+  .stats-row{flex-wrap:wrap;gap:16px;}
+  .stat{border-right:none;padding-right:0;margin-right:0;}
+  .actions{width:100%;}
+  .btn{flex:1;justify-content:center;}
+  #videoGrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+  .tabs{overflow-x:auto;}
+  .tab{padding:14px 18px;white-space:nowrap;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- BANNER -->
+<div class="banner-wrap">
+  <div class="banner-mesh" id="bannerDefault">
+    <div style="width:100%;height:100%;background:radial-gradient(ellipse 70% 90% at 25% 60%,rgba(0,100,200,0.4) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 75% 30%,rgba(0,60,140,0.25) 0%,transparent 60%),#07070f;"></div>
+  </div>
+  <img id="banner" style="display:none;" onload="this.style.display='block';document.getElementById('bannerDefault').style.display='none';">
+</div>
+
+<div class="page">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="profile-card">
+
+      <!-- AVATAR -->
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <div class="avatar">
+          <img id="avatar" src="" alt="Profile avatar">
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="profile-body">
+        <div class="profile-top-row">
+          <div class="profile-identity">
+            <div class="name" id="name">Loading...</div>
+            <div class="handle" id="handle">@loading</div>
+          </div>
+          <div class="actions">
+            <button class="btn flow" id="flowBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Flow 
+            </button>
+            <button class="btn edit" id="editBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="bio" id="bio">Loading profile...</div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-value" id="videosCount">0</div>
+            <div class="stat-label">Videos</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="viewsCount">0</div>
+            <div class="stat-label">Total Views</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="flowCount">0</div>
+            <div class="stat-label">Flow Accounts</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <div class="tab active">Videos</div>
+      <div class="tab">About</div>
+    </div>
+  </div>
+
+  <!-- VIDEO GRID -->
+  <div id="videoGrid"></div>
+
+  <!-- ABOUT PAGE -->
+  <div class="aboutPage" id="aboutPage">
+    <div class="about-grid">
+      <div class="aboutCard">
+        <div class="aboutTitle">Creator Info</div>
+        <div class="about-items">
+          <div class="aboutItem">
+            <div class="aboutLabel">Display Name</div>
+            <div class="aboutValue" id="aboutName"></div>
+          </div>
+          <div class="aboutItem">
+            <div class="aboutLabel">Username</div>
+            <div class="aboutValue" id="aboutUsername"></div>
+          </div>
+          <div class="aboutItem">
+            <div class="aboutLabel">Bio</div>
+            <div class="aboutValue" id="aboutBio"></div>
+          </div>
+          <div class="aboutItem">
+            <div class="aboutLabel">Joined</div>
+            <div class="aboutValue" id="aboutJoined"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="editModal" class="modal">
+  <div class="modal-box">
+    <h2>Edit Profile</h2>
+
+    <label>Display Name</label>
+    <input id="editName" placeholder="Your display name">
+
+    <label>Username</label>
+    <input id="editUsername" placeholder="@username">
+
+    <label>Bio</label>
+    <textarea id="editBio" placeholder="Tell people about yourself..."></textarea>
+
+    <label>Avatar</label>
+    <input type="file" id="avatarUpload" accept="image/*">
+
+    <label>Banner</label>
+    <input type="file" id="bannerUpload" accept="image/*">
+
+    <div class="modal-buttons">
+      <button onclick="saveProfile()">Save Changes</button>
+      <button onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const params = new URLSearchParams(location.search);
+const email = params.get("user");
+
+let profile = null;
+let videos = [];
+let isOwnProfile = false;
+
+async function loadProfile() {
+  const [pRes, vRes, sRes, meRes] = await Promise.all([
+    fetch("/api/profile/" + encodeURIComponent(email)),
+    fetch("/api/videos"),
+    fetch("/api/subscribers/" + encodeURIComponent(email)),
+    fetch("/api/me")
+  ]);
+
+  profile = await pRes.json();
+  videos = await vRes.json();
+
+  const subsData = sRes.ok ? await sRes.json() : { count: 0 };
+  profile._realFlowCount = subsData.count;
+
+  const me = meRes.ok ? await meRes.json() : { loggedIn: false };
+  isOwnProfile = me.loggedIn && me.email === email;
+
+if (me.loggedIn && !isOwnProfile) {
+  const mySubsRes = await fetch("/api/subscriptions/" + encodeURIComponent(me.email));
+
+  if (mySubsRes.ok) {
+    const mySubsData = await mySubsRes.json();
+    isFollowing = mySubsData.owners.includes(email);
+  }
+}
+
+render();
+}
+
+function fillAbout() {
+  document.getElementById("aboutName").textContent = profile.displayName;
+  document.getElementById("aboutUsername").textContent = "@" + profile.username;
+  document.getElementById("aboutBio").textContent = profile.bio;
+  document.getElementById("aboutJoined").textContent = new Date(profile.joined).toDateString();
+}
+
+function formatViews(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "K";
+  return n;
+}
+
+function render() {
+  document.getElementById("name").textContent = profile.displayName;
+  document.getElementById("handle").textContent = "@" + profile.username;
+  document.getElementById("bio").textContent = profile.bio;
+  const editBtn = document.getElementById("editBtn");
+const flowBtn = document.getElementById("flowBtn");
+
+if (isOwnProfile) {
+  editBtn.style.display = "flex";
+  flowBtn.style.display = "none";
+} else {
+  editBtn.style.display = "none";
+  flowBtn.style.display = "flex";
+  renderFlowBtn();
+}
+  const avatarEl = document.getElementById("avatar");
+  if (profile.avatar) avatarEl.src = profile.avatar;
+
+  const bannerEl = document.getElementById("banner");
+  if (profile.banner) bannerEl.src = profile.banner;
+
+  document.getElementById("flowCount").textContent = formatViews(
+    profile._realFlowCount != null
+      ? profile._realFlowCount
+      : (profile.flowAccounts || 0)
+  );
+
+  const userVideos = videos.filter(v => v.uploaderEmail === profile.email);
+  document.getElementById("videosCount").textContent = userVideos.length;
+
+  let totalViews = 0;
+  userVideos.forEach(v => totalViews += v.views || 0);
+  document.getElementById("viewsCount").textContent = formatViews(totalViews);
+
+  const grid = document.getElementById("videoGrid");
+  grid.innerHTML = "";
+
+  if (userVideos.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8M12 17v4"/>
+        </svg>
+        <h3>No videos yet</h3>
+        <p>Videos uploaded by this creator will appear here.</p>
+      </div>`;
+    return;
+  }
+
+  userVideos.forEach(v => {
+    grid.innerHTML += `
+    <div class="video" onclick="playProfileVideo('${v.id}')">
+        <div class="video-thumb">
+          <img src="${v.thumb || ''}" alt="${v.title}" loading="lazy">
+          <div class="video-thumb-overlay">
+            <div class="play-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-meta">
+            <span>${formatViews(v.views || 0)} views</span>
+          </div>
+        </div>
+        <div class="video-accent"></div>
+      </div>`;
+  });
+
+  fillAbout();
+}
+
+const tabs = document.querySelectorAll(".tab");
+const videoGrid = document.getElementById("videoGrid");
+const aboutPage = document.getElementById("aboutPage");
+
+tabs[0].onclick = () => {
+  tabs[0].classList.add("active");
+  tabs[1].classList.remove("active");
+  videoGrid.style.display = "grid";
+  aboutPage.style.display = "none";
+};
+
+tabs[1].onclick = () => {
+  tabs[1].classList.add("active");
+  tabs[0].classList.remove("active");
+  videoGrid.style.display = "none";
+  aboutPage.style.display = "block";
+};
+
+function openEdit() {
+  document.getElementById("editModal").classList.add("show");
+  document.getElementById("editName").value = profile.displayName;
+  document.getElementById("editUsername").value = profile.username;
+  document.getElementById("editBio").value = profile.bio;
+}
+
+function closeEdit() {
+  document.getElementById("editModal").classList.remove("show");
+}
+
+document.getElementById("editBtn").onclick = openEdit;
+
+let isFollowing = false;
+
+function renderFlowBtn() {
+  const btn = document.getElementById("flowBtn");
+
+  btn.innerHTML = isFollowing
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Following`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Flow`;
+}
+
+document.getElementById("flowBtn").onclick = async function () {
+  const meRes = await fetch("/api/me");
+  const me = meRes.ok ? await meRes.json() : { loggedIn: false };
+
+  if (!me.loggedIn) return;
+
+  const method = isFollowing ? "DELETE" : "POST";
+
+  const res = await fetch("/api/subscriptions", {
+    method,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      subscriber: me.email,
+      owner: email
+    })
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    isFollowing = data.subscribed;
+    document.getElementById("flowCount").textContent = formatViews(data.count);
+    renderFlowBtn();
+  }
+};
+function saveProfile() {
+  fetch("/api/profile/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      displayName: document.getElementById("editName").value,
+      username: document.getElementById("editUsername").value,
+      bio: document.getElementById("editBio").value
+    })
+  })
+  .then(r => r.json())
+  .then(() => {
+    closeEdit();
+    location.reload();
+  });
+}
+
+function playProfileVideo(id) {
+  window.location.href = '/dashboard.html?play=' + encodeURIComponent(id);
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

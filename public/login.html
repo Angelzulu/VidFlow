@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VIDflow — Sign In</title>
+<style>
+  :root {
+    --bg:       #07070f;
+    --card:     #0e1224;
+    --border:   #1e2a4a;
+    --blue:     #00b4ff;
+    --blue2:    #0066ff;
+    --glow:     rgba(0,180,255,.18);
+    --text:     #f0f4ff;
+    --text2:    #8899bb;
+    --text3:    #556077;
+    --error:    #ff6b6b;
+    --success:  #1ecb7b;
+    --font:     'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% -10%, #0d1f4a 0%, var(--bg) 55%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font);
+    color: var(--text);
+    padding: 20px;
+  }
+
+  /* ── Animated background grid ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,180,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,180,255,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 400px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 36px 32px;
+    box-shadow: 0 0 60px var(--glow);
+  }
+
+  /* ── Logo ── */
+  .logo {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 6px;
+  }
+  .logo em {
+    color: var(--blue);
+    font-style: normal;
+    text-shadow: 0 0 20px var(--blue);
+  }
+  .tagline {
+    text-align: center;
+    color: var(--text2);
+    font-size: 13px;
+    margin-bottom: 30px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    background: rgba(255,255,255,.04);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 26px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    border-radius: 7px;
+    font-family: var(--font);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    background: transparent;
+    color: var(--text2);
+  }
+  .tab.active {
+    background: var(--blue2);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(0,102,255,.4);
+  }
+
+  /* ── Forms ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .field { margin-bottom: 16px; }
+  label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,180,255,.12);
+  }
+  input::placeholder { color: var(--text3); }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, var(--blue2), var(--blue));
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    box-shadow: 0 4px 20px rgba(0,102,255,.35);
+  }
+  .btn-primary:hover:not(:disabled) { opacity: .9; }
+  .btn-primary:active:not(:disabled) { transform: scale(.99); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text3); font-size: 11.5px;
+    margin: 20px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .btn-google {
+    width: 100%;
+    padding: 12px 14px;
+    background: #fff;
+    border: none;
+    border-radius: 10px;
+    color: #1f1f1f;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .15s, box-shadow .15s;
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
+  }
+  .btn-google:hover { background: #f5f5f5; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+  .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* ── Error / success messages ── */
+  .msg {
+    font-size: 12.5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .msg.error   { background: rgba(255,107,107,.12); border: 1px solid rgba(255,107,107,.3); color: var(--error);   display: block; }
+  .msg.success { background: rgba(30,203,123,.12);  border: 1px solid rgba(30,203,123,.3);  color: var(--success); display: block; }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    display: inline-block; margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Footer ── */
+  .foot {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.7;
+  }
+  .foot a { color: var(--text2); text-decoration: none; }
+  .foot a:hover { color: var(--blue); }
+
+  /* ── Forgot password link ── */
+  .forgot {
+    float: right;
+    font-size: 11.5px;
+    color: var(--text2);
+    cursor: pointer;
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-family: var(--font);
+  }
+  .forgot:hover { color: var(--blue); }
+  .btn-guest {
+  width: 100%;
+  padding: 11px;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text3);
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.btn-guest:hover {
+  border-color: var(--text2);
+  color: var(--text2);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- Logo -->
+  <div class="logo">VID<em>flow</em></div>
+  <div class="tagline">Upload, watch & share your world</div>
+
+  <!-- Tab switcher -->
+  <div class="tabs">
+    <button class="tab active" id="tab-login"  onclick="switchTab('login')">Sign In</button>
+    <button class="tab"        id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+  </div>
+
+  <!-- ── SIGN IN panel ── -->
+  <div class="panel active" id="panel-login">
+    <div class="msg" id="login-msg"></div>
+
+    <div class="field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label for="login-pass">
+        Password
+        <button class="forgot" type="button" onclick="forgotPassword()">Forgot password?</button>
+      </label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button class="btn-primary" id="btn-login" onclick="signInEmail()">Sign In</button>
+
+    <div class="divider">or</div>
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.3 6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.3 6 29.4 4 24 4c-7.4 0-13.8 4.2-17 10.3z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.5 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.9 39.6 16.4 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.2 5.2C40.9 36.3 44 30.8 44 24c0-1.3-.1-2.7-.4-3.5z"/>
+      </svg>
+      Continue with Google
+</button>
+
+<button class="btn-guest" onclick="continueAsGuest()">
+  👁 Continue as Guest
+</button>
+
+</div>
+
+<!-- ── SIGN UP panel ── -->
+  <div class="panel" id="panel-signup">
+    <div class="msg" id="signup-msg"></div>
+
+    <div class="field">
+      <label for="signup-name">Display Name</label>
+      <input type="text" id="signup-name" placeholder="Your name" autocomplete="name" />
+    </div>
+    <div class="field">
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label for="signup-pass">Password</label>
+      <input type="password" id="signup-pass" placeholder="At least 6 characters" autocomplete="new-password" />
+    </div>
+
+    <button class="btn-primary" id="btn-signup" onclick="signUpEmail()">Create Account</button>
+
+    <div class="divider">or</div>
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.3 6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.3 6 29.4 4 24 4c-7.4 0-13.8 4.2-17 10.3z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.5 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.9 39.6 16.4 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.2 5.2C40.9 36.3 44 30.8 44 24c0-1.3-.1-2.7-.4-3.5z"/>
+      </svg>
+      Sign up with Google
+</button>
+
+<button class="btn-guest" onclick="continueAsGuest()">
+  👁 Continue as Guest
+</button>
+
+</div>
+
+<div class="foot">
+    By continuing you agree to VIDflow's Terms of Service<br>and Privacy Policy.
+  </div>
+</div>
+
+<!-- Firebase SDKs (client-side, loaded from CDN) -->
+<script type="module">
+  import { initializeApp }                            from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword,
+           createUserWithEmailAndPassword,
+           updateProfile, GoogleAuthProvider,
+           signInWithPopup, sendPasswordResetEmail,
+           onAuthStateChanged }                       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+  // ── Firebase config — swap these for your real project values ──────────────
+  // Get them from Firebase Console → Project Settings → Your apps → SDK setup
+  const firebaseConfig = {
+  apiKey: "AIzaSyDTyx2BF2sKP_P_xyclxFW0YE7d1k6T8vE",
+  authDomain: "vidflowzm.firebaseapp.com",
+  projectId: "vidflowzm",
+  storageBucket: "vidflowzm.firebasestorage.app",
+  messagingSenderId: "87324159472",
+  appId: "1:87324159472:web:603bc7928c154d95980135"
+};
+  // ───────────────────────────────────────────────────────────────────────────
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // True while a sign-in button handler is already running redirectToDashboard().
+  // Prevents onAuthStateChanged from firing a duplicate POST to /api/firebase-session.
+  let handlingRedirect = false;
+
+  // If the user already has a valid Firebase session (e.g. they refreshed the
+  // login page while still signed in), skip straight to the dashboard.
+  onAuthStateChanged(auth, async (user) => {
+    if (user && !handlingRedirect) {
+      await redirectToDashboard(user);
+    }
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading
+      ? '<span class="spinner"></span>Please wait…'
+      : btn.dataset.label;
+  }
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className   = 'msg ' + type;
+  }
+  function clearMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  // Send the Firebase ID token to Express; Express sets a session cookie.
+  // After that every existing API call (requireLogin) works unchanged.
+  async function redirectToDashboard(user) {
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/firebase-session', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ idToken })
+    });
+    if (res.ok) {
+      window.location.href = '/dashboard.html';
+    } else {
+      const data = await res.json().catch(() => ({}));
+      console.error('Session creation failed:', data.error);
+    }
+  }
+
+  // ── Email sign-in ──────────────────────────────────────────────────────────
+  window.signInEmail = async function () {
+    clearMsg('login-msg');
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    if (!email || !pass) return showMsg('login-msg', 'Please fill in both fields.', 'error');
+
+    setLoading('btn-login', true);
+    handlingRedirect = true;
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      await redirectToDashboard(cred.user);
+    } catch (e) {
+      handlingRedirect = false;
+      showMsg('login-msg', friendlyError(e.code), 'error');
+    } finally {
+      setLoading('btn-login', false);
+    }
+  };
+
+  // ── Email sign-up ──────────────────────────────────────────────────────────
+  window.signUpEmail = async function () {
+    clearMsg('signup-msg');
+    const name  = document.getElementById('signup-name').value.trim()  || 'VIDflow User';
+    const email = document.getElementById('signup-email').value.trim();
+    const pass  = document.getElementById('signup-pass').value;
+    if (!email || !pass) return showMsg('signup-msg', 'Please fill in email and password.', 'error');
+    if (pass.length < 6) return showMsg('signup-msg', 'Password must be at least 6 characters.', 'error');
+
+    setLoading('btn-signup', true);
+    handlingRedirect = true;
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await redirectToDashboard(cred.user);
+    } catch (e) {
+      handlingRedirect = false;
+      showMsg('signup-msg', friendlyError(e.code), 'error');
+    } finally {
+      setLoading('btn-signup', false);
+    }
+  };
+
+  // ── Google sign-in (shared by both tabs) ──────────────────────────────────
+  window.signInGoogle = async function () {
+    handlingRedirect = true;
+    try {
+      const cred = await signInWithPopup(auth, provider);
+      await redirectToDashboard(cred.user);
+    } catch (e) {
+      handlingRedirect = false;
+      if (e.code !== 'auth/popup-closed-by-user') {
+        showMsg('login-msg',  friendlyError(e.code), 'error');
+        showMsg('signup-msg', friendlyError(e.code), 'error');
+      }
+    }
+  };
+
+  // ── Forgot password ────────────────────────────────────────────────────────
+  window.forgotPassword = async function () {
+    const email = document.getElementById('login-email').value.trim();
+    if (!email) return showMsg('login-msg', 'Enter your email address first.', 'error');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showMsg('login-msg', 'Password reset email sent — check your inbox.', 'success');
+    } catch (e) {
+      showMsg('login-msg', friendlyError(e.code), 'error');
+    }
+  };
+
+  // ── Tab switching ──────────────────────────────────────────────────────────
+  window.switchTab = function (tab) {
+    document.getElementById('panel-login').classList.toggle('active',  tab === 'login');
+    document.getElementById('panel-signup').classList.toggle('active', tab === 'signup');
+    document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+    document.getElementById('tab-signup').classList.toggle('active',   tab === 'signup');
+    clearMsg('login-msg');
+    clearMsg('signup-msg');
+  };
+
+  // ── Enter key submits the active panel's form ──────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('panel-login').classList.contains('active'))  window.signInEmail();
+    else window.signUpEmail();
+  });
+
+  // ── Store button labels for spinner restoration ────────────────────────────
+  document.getElementById('btn-login').dataset.label  = 'Sign In';
+  document.getElementById('btn-signup').dataset.label = 'Create Account';
+
+  // ── Human-readable Firebase error messages ─────────────────────────────────
+  function friendlyError(code) {
+    const map = {
+      'auth/user-not-found':         'No account found with that email.',
+      'auth/wrong-password':         'Incorrect password.',
+      'auth/invalid-credential':     'Email or password is incorrect.',
+      'auth/email-already-in-use':   'An account with that email already exists.',
+      'auth/weak-password':          'Password must be at least 6 characters.',
+      'auth/invalid-email':          'Please enter a valid email address.',
+      'auth/too-many-requests':      'Too many attempts. Try again later.',
+      'auth/network-request-failed': 'Network error — check your connection.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+  window.continueAsGuest = function () {
+  localStorage.setItem('vf_guest', '1');
+  window.location.href = '/guest-dashboard';
+};
+</script>
+</body>
+</html>

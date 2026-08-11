@@ -1,0 +1,3367 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"><meta name="theme-color" content="#07070f"><title>VIDflow</title></head><body>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Baloo+2:wght@500;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07070f;--bg2:#0e0e1a;--bg3:#151524;--bg4:#1e1e30;--bg5:#27273a;
+  --blue:#00b4ff;--blue2:#0088cc;--blue-glow:#00b4ff44;
+  --green:#1ecb7b;--green-glow:#1ecb7b44;
+  --text:#eeeef8;--text2:#8888aa;--text3:#44446a;
+  --border:#ffffff0d;--border2:#00b4ff22;--border3:#00b4ff44;
+  --font-h:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+  --logo-font:var(--font-h);
+}
+/* =====================================================================
+   KIDS MODE THEME — swaps the same CSS variables everything already
+   uses, so no component needs its own "kids version" of a color. Applied
+   by toggling this class on <body> (see applyKidsModeUI()). Brighter,
+   warmer palette + a rounder, playful display font for headings/logo. */
+body.kids-mode{
+  --bg:#fff6e6;--bg2:#fff0d6;--bg3:#ffe4b0;--bg4:#ffd68c;--bg5:#ffc766;
+  --blue:#ff7a30;--blue2:#ff5a1a;--blue-glow:#ff7a3055;
+  --green:#2fbf71;--green-glow:#2fbf7155;
+  --text:#3a2410;--text2:#8a6531;--text3:#c99a55;
+  --border:#00000012;--border2:#ff7a3033;--border3:#ff7a3066;
+  --logo-font:'Baloo 2',var(--font-h);
+}
+body.kids-mode .logo,body.kids-mode .s-link,body.kids-mode .sec-title,
+body.kids-mode .un-title,body.kids-mode .empty-title,body.kids-mode .shelf-title{font-family:var(--logo-font);}
+body.kids-mode nav{background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);}
+body.kids-mode .logo em{color:var(--blue);text-shadow:0 0 10px var(--blue-glow);}
+body.kids-mode .vcard,body.kids-mode .shelf-card,body.kids-mode .signin-card{border-radius:22px;}
+body.kids-mode .vthumb,body.kids-mode .shelf-thumb{border-radius:18px;}
+body.kids-mode .btn-big,body.kids-mode .act,body.kids-mode .s-link{border-radius:20px;}
+@keyframes kidsBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+body.kids-mode .s-link:hover,body.kids-mode .vcard:hover .vthumb,body.kids-mode .shelf-card:hover .shelf-thumb{animation:kidsBounce .5s ease;}
+body.kids-mode .kids-badge{animation:kidsBounce 1.6s ease-in-out infinite;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-text-size-adjust:100%;transition:background .25s ease,color .25s ease;}
+#app-root{min-height:100vh;min-height:100dvh;}
+
+/* Sign-in screen and Google Picker CSS removed — auth is now /login.html */
+
+
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 20px;height:60px;gap:14px;}
+.logo{font-family:var(--font-h);font-size:21px;font-weight:800;letter-spacing:-1px;white-space:nowrap;cursor:pointer;}
+.logo em{color:var(--blue);font-style:normal;text-shadow:0 0 12px var(--blue);}
+.search-wrap{flex:1;max-width:460px;margin:0 auto;display:flex;}
+.search-wrap input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-right:none;border-radius:20px 0 0 20px;padding:7px 16px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;}
+.search-wrap input::placeholder{color:var(--text3);}
+.search-wrap input:focus{border-color:var(--border3);}
+.search-wrap button{background:var(--bg4);border:1px solid var(--border2);border-left:none;border-radius:0 20px 20px 0;padding:7px 14px;color:var(--text2);cursor:pointer;font-size:13px;transition:all .2s;}
+.search-wrap button:hover{background:var(--blue);color:#000;border-color:var(--blue);}
+.btn-up{background:var(--blue);color:#000;border:none;border-radius:20px;padding:7px 18px;font-family:var(--font-h);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 0 16px var(--blue-glow);}
+.btn-up:hover{background:#33ccff;box-shadow:0 0 24px #00b4ff66;}
+.nav-icon-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text2);transition:all .15s;flex-shrink:0;}
+.nav-icon-btn:hover{border-color:var(--border3);color:var(--blue);}
+.nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#0055aa);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0;font-family:var(--font-h);}
+
+.wrap{display:flex;height:calc(100vh - 60px);height:calc(100dvh - 60px);}
+aside{width:196px;min-width:196px;background:var(--bg2);border-right:1px solid var(--border2);overflow-y:auto;padding:14px 10px;transition:width .15s,min-width .15s,padding .15s,opacity .15s;}
+/* While watching, the sidebar collapses away entirely so the player gets
+   the full width of the window instead of sharing it — a real, visible
+   "bigger video box", not just a CSS tweak on a box that's still boxed in. */
+.wrap.watching aside{width:0;min-width:0;padding:0;border-right:none;opacity:0;overflow:hidden;pointer-events:none;}
+main{flex:1;overflow-y:auto;padding:20px 22px;position:relative;}
+.wrap.watching main{padding:18px 26px;}
+
+.s-link{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s;border-radius:12px;margin-bottom:3px;}
+.s-link:hover{background:var(--bg3);color:var(--text);}
+.s-link.active{background:var(--blue-glow);color:var(--blue);text-shadow:0 0 8px var(--blue);}
+.s-sep{height:1px;background:var(--border2);margin:10px 6px;}
+.s-head{font-size:10px;font-weight:700;color:var(--text3);padding:12px 18px 4px;text-transform:uppercase;letter-spacing:1.2px;}
+.s-vid{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;transition:background .15s;border-radius:6px;margin:0 4px;}
+.s-vid:hover{background:var(--bg3);}
+.s-vid-thumb{width:40px;height:23px;border-radius:4px;background:var(--bg4);overflow:hidden;flex-shrink:0;border:1px solid var(--border2);}
+.s-vid-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.s-vid-thumb canvas{width:100%;height:100%;display:block;}
+.s-vid-title{font-size:11.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.s-vid-dur{font-size:10px;color:var(--text3);}
+.s-empty{font-size:12px;color:var(--text3);padding:8px 18px;line-height:1.6;}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:80px 20px;text-align:center;}
+.empty-icon{font-size:60px;filter:drop-shadow(0 0 16px var(--blue));}
+.empty-title{font-family:var(--font-h);font-size:22px;font-weight:700;color:var(--text);}
+.empty-sub{font-size:14px;color:var(--text3);max-width:300px;line-height:1.6;}
+.btn-big{background:var(--blue);color:#000;border:none;border-radius:24px;padding:12px 30px;font-family:var(--font-h);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 0 20px var(--blue-glow);transition:all .2s;}
+.btn-big:hover{background:#33ccff;transform:scale(1.04);}
+
+.shelf{margin-bottom:28px;}
+.shelf-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.shelf-title{font-family:var(--font-h);font-size:15px;font-weight:700;color:var(--text);}
+.shelf-count{font-size:11.5px;color:var(--text3);}
+.shelf-row{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x proximity;}
+.shelf-row::-webkit-scrollbar{height:6px;}
+.shelf-row::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+.shelf-card{scroll-snap-align:start;flex:0 0 auto;width:210px;cursor:pointer;border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);transition:transform .18s,border-color .18s;}
+.shelf-card:hover{transform:scale(1.045);border-color:var(--border3);box-shadow:0 6px 22px var(--blue-glow);z-index:2;}
+.shelf-thumb{aspect-ratio:16/9;background:var(--bg4);position:relative;overflow:hidden;}
+.shelf-thumb img,.shelf-thumb canvas{width:100%;height:100%;object-fit:cover;display:block;}
+.shelf-info{padding:9px 11px 11px;}
+.shelf-vtitle{font-size:12.5px;font-weight:500;line-height:1.35;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.shelf-vmeta{font-size:11px;color:var(--text3);}
+
+.cats{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;scrollbar-width:none;}
+.cats::-webkit-scrollbar{display:none;}
+.cat{background:var(--bg3);border:1px solid var(--border2);border-radius:18px;padding:5px 14px;font-size:12.5px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .2s;}
+.cat.active,.cat:hover{background:var(--blue);color:#000;border-color:var(--blue);font-weight:600;box-shadow:0 0 10px var(--blue-glow);}
+.sec-title{font-family:var(--font-h);font-size:18px;font-weight:700;margin-bottom:16px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.vcard{cursor:pointer;border-radius:16px;overflow:hidden;transition:transform .2s,border-color .2s;background:var(--bg2);border:1px solid var(--border);position:relative;}
+.vcard:hover{transform:translateY(-4px);border-color:var(--border3);box-shadow:0 6px 26px var(--blue-glow);}
+.vthumb{aspect-ratio:16/9;background:var(--bg4);position:relative;overflow:hidden;}
+.vthumb img,.vthumb canvas,.vthumb video{width:100%;height:100%;object-fit:cover;display:block;}
+.vdur{position:absolute;bottom:6px;right:7px;background:#000000cc;color:#fff;font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;font-family:var(--font-h);}
+.vtype-badge{position:absolute;top:6px;left:7px;color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:9px;font-family:var(--font-h);}
+.vtype-badge.song{background:var(--green);}
+.vtype-badge.movie{background:var(--blue);}
+.vinfo{padding:10px 12px 12px;}
+.vrow{display:flex;gap:9px;}
+.vch-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-h);flex-shrink:0;background:var(--blue-glow);color:var(--blue);border:1px solid var(--border3);}
+.vtitle{font-size:13.5px;font-weight:500;line-height:1.4;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vch{font-size:12px;color:var(--text2);}
+.vstats{font-size:11.5px;color:var(--text3);margin-top:1px;}
+
+/* ===== PLAYER ===== */
+.pv{display:none;}
+.pv.on{
+  display:flex;
+  gap:30px;
+  align-items:flex-start;
+  width:100%;
+}
+.pv-left{
+  flex:1;
+  min-width:0;
+  max-width:820px;   /* match video-box cap — prevents blank column to the right of the video */
+}
+.pv-right{width:320px;min-width:280px;flex-shrink:0;}
+
+/* Video box — 16:9, fills pv-left but caps at 820px so it stays compact */
+.video-box{
+  background:#000;
+  border-radius:14px;
+  overflow:hidden;
+  width:100%;
+  max-width:820px;
+  aspect-ratio:16/9;
+  position:relative;
+  border:1px solid var(--border3);
+  box-shadow:0 0 40px var(--blue-glow);
+  cursor:pointer;
+}
+.video-box video{width:100%;height:100%;display:block;background:#000;outline:none;}
+.no-vid-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg4);color:var(--text3);font-size:14px;}
+
+/* nav arrows over the player */
+.vb-navbtn{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:#000000aa;border:1px solid var(--border3);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:all .15s;}
+.vb-navbtn:hover{background:var(--blue);color:#000;}
+.vb-prev{left:10px;}
+.vb-next{right:10px;}
+
+/* ===== CUSTOM PLAYER CONTROLS OVERLAY ===== */
+.vf-controls{
+  position:absolute;bottom:0;left:0;right:0;z-index:9;
+  background:linear-gradient(0deg,#000000e0 0%,#00000088 60%,transparent 100%);
+  padding:8px 14px 10px;
+  display:flex;flex-direction:column;gap:6px;
+  transition:opacity .3s ease;
+  border-radius:0 0 14px 14px;
+}
+.video-box.controls-hidden .vf-controls{opacity:0;pointer-events:none;}
+.video-box.controls-hidden .vb-navbtn{opacity:0;pointer-events:none;}
+.video-box.paused .vf-controls,.video-box.paused .vb-navbtn{opacity:1 !important;pointer-events:auto !important;}
+
+/* Timeline / progress bar */
+.vf-timeline{
+  width:100%;height:18px;display:flex;align-items:center;cursor:pointer;position:relative;
+}
+.vf-track{
+  flex:1;height:4px;background:#ffffff30;border-radius:3px;position:relative;overflow:visible;transition:height .15s;
+}
+.vf-timeline:hover .vf-track{height:6px;}
+.vf-buffered{position:absolute;top:0;left:0;height:100%;background:#ffffff40;border-radius:3px;pointer-events:none;}
+.vf-progress{position:absolute;top:0;left:0;height:100%;background:var(--blue);border-radius:3px;pointer-events:none;box-shadow:0 0 6px var(--blue);}
+.vf-thumb{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:13px;height:13px;background:#fff;border-radius:50%;
+  box-shadow:0 0 6px var(--blue);pointer-events:none;
+  opacity:0;transition:opacity .15s;
+}
+.vf-timeline:hover .vf-thumb,.vf-timeline.dragging .vf-thumb{opacity:1;}
+
+/* Bottom row: buttons + time + settings + fullscreen */
+.vf-bar{display:flex;align-items:center;gap:8px;}
+.vf-btn{
+  background:none;border:none;color:#fff;cursor:pointer;
+  font-size:17px;padding:2px 4px;line-height:1;opacity:.9;
+  transition:opacity .15s,transform .15s;flex-shrink:0;
+}
+.vf-btn:hover{opacity:1;transform:scale(1.15);}
+.vf-time{font-size:12px;color:#ffffffcc;font-family:var(--font-b);white-space:nowrap;letter-spacing:.3px;flex-shrink:0;}
+.vf-spacer{flex:1;}
+
+/* Volume slider */
+.vf-vol-wrap{display:flex;align-items:center;gap:4px;}
+.vf-vol-slider{
+  -webkit-appearance:none;appearance:none;
+  width:64px;height:3px;border-radius:2px;
+  background:linear-gradient(to right,var(--blue) 0%,var(--blue) var(--vol,100%),#ffffff40 var(--vol,100%),#ffffff40 100%);
+  cursor:pointer;outline:none;border:none;flex-shrink:0;
+}
+.vf-vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 4px var(--blue);}
+.vf-vol-slider::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:#fff;cursor:pointer;border:none;}
+
+/* Settings menu */
+.vf-settings-wrap{position:relative;}
+.vf-settings-menu{
+  display:none;
+  position:absolute;bottom:calc(100% + 8px);right:0;
+  background:var(--bg2);border:1px solid var(--border3);
+  border-radius:12px;min-width:180px;
+  box-shadow:0 8px 32px #000000cc,0 0 20px var(--blue-glow);
+  overflow:hidden;z-index:20;
+}
+.vf-settings-menu.open{display:block;}
+.vf-settings-section{padding:8px 0;}
+.vf-settings-header{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text3);padding:6px 14px 4px;font-family:var(--font-h);
+}
+.vf-settings-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;font-size:13px;color:var(--text2);cursor:pointer;
+  transition:background .12s;gap:10px;
+}
+.vf-settings-item:hover{background:var(--bg3);color:var(--text);}
+.vf-settings-item.active{color:var(--blue);font-weight:600;}
+.vf-settings-item .check{font-size:12px;color:var(--blue);flex-shrink:0;}
+.vf-settings-sep{height:1px;background:var(--border2);margin:2px 0;}
+
+/* Removing old quality overlay since quality moves into settings menu */
+.quality-wrap{display:none !important;}
+
+.pt{font-family:var(--font-h);font-size:19px;font-weight:700;margin-top:10px;line-height:1.3;}
+.p-meta{display:flex;align-items:center;justify-content:space-between;margin:10px 0 8px;flex-wrap:wrap;gap:8px;}
+.p-chan{display:flex;align-items:center;gap:10px;}
+.p-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:var(--font-h);background:var(--blue-glow);color:var(--blue);border:1px solid var(--border3);}
+.p-cn{font-weight:500;font-size:14px;}
+.p-cs{font-size:11.5px;color:var(--text2);}
+.btn-sub{background:var(--blue);color:#000;border:none;border-radius:18px;padding:7px 16px;font-family:var(--font-h);font-size:12.5px;font-weight:700;cursor:pointer;margin-left:8px;transition:all .2s;box-shadow:0 0 10px var(--blue-glow);}
+.btn-sub.subbed{background:var(--bg4);color:var(--text2);box-shadow:none;border:1px solid var(--border2);}
+.acts{display:flex;gap:7px;flex-wrap:wrap;}
+.act{background:var(--bg3);border:1px solid var(--border2);border-radius:18px;padding:7px 14px;color:var(--text2);font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:var(--font-b);transition:all .15s;}
+.act:hover{border-color:var(--border3);color:var(--blue);}
+.act.liked{color:var(--blue);border-color:var(--blue);box-shadow:0 0 8px var(--blue-glow);}
+.act.del:hover{color:#ff4444;border-color:#ff444444;}
+.act.on{color:var(--green);border-color:var(--green);box-shadow:0 0 8px var(--green-glow);}
+.desc-box{background:var(--bg3);border-radius:10px;padding:12px 14px;margin-top:14px;border:1px solid var(--border);}
+.desc-stats{font-size:12.5px;font-weight:600;margin-bottom:5px;color:var(--blue);}
+.desc-txt{font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-line;}
+.cmts{margin-top:22px;}
+.cmts-head{font-family:var(--font-h);font-size:15px;font-weight:700;margin-bottom:14px;}
+.cmt-inp-row{display:flex;gap:10px;margin-bottom:18px;align-items:flex-start;}
+.user-av{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#000;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--font-h);flex-shrink:0;overflow:hidden;}
+.user-av img{width:100%;height:100%;object-fit:cover;}
+.cmt-inp{flex:1;background:transparent;border:none;border-bottom:1px solid var(--border2);padding:6px 0;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;}
+.cmt-inp::placeholder{color:var(--text3);}
+.cmt-inp:focus{border-bottom-color:var(--blue);}
+.btn-cmt{background:var(--blue);color:#000;border:none;border-radius:18px;padding:7px 14px;font-family:var(--font-h);font-size:12.5px;font-weight:700;cursor:pointer;}
+.cmt{display:flex;gap:10px;margin-bottom:14px;}
+.cmt-body{flex:1;}
+.cmt-author{font-size:12.5px;font-weight:600;color:var(--blue);}
+.cmt-time{font-size:11px;color:var(--text3);margin-left:7px;}
+.cmt-text{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.cmt-act{background:none;border:none;color:var(--text3);font-size:11.5px;cursor:pointer;font-family:var(--font-b);margin-right:10px;}
+.cmt-act:hover{color:var(--text2);}
+.un-title{font-family:var(--font-h);font-size:12px;font-weight:700;margin-bottom:12px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;}
+.un-card{display:flex;gap:9px;cursor:pointer;padding:7px;border-radius:8px;transition:background .15s;margin-bottom:6px;}
+.un-card:hover{background:var(--bg3);}
+.un-thumb{width:116px;min-width:116px;aspect-ratio:16/9;border-radius:6px;background:var(--bg4);overflow:hidden;position:relative;border:1px solid var(--border2);}
+.un-thumb img,.un-thumb canvas{width:100%;height:100%;object-fit:cover;display:block;}
+.un-dur{position:absolute;bottom:3px;right:4px;background:#000000cc;color:#fff;font-size:10px;font-weight:600;padding:1px 4px;border-radius:3px;}
+.un-t{font-size:12.5px;font-weight:500;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.un-c{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* MINI PLAYER (in-page floating, used as fallback / mini-bar before real PiP) */
+.mini-player{position:fixed;bottom:16px;right:16px;width:280px;background:#000;border-radius:10px;overflow:hidden;border:1px solid var(--border3);box-shadow:0 0 30px var(--blue-glow);z-index:150;display:none;}
+.mini-player.show{display:block;}
+.mini-player video{width:100%;display:block;aspect-ratio:16/9;background:#000;}
+.mini-bar{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);padding:6px 10px;}
+.mini-title{font-size:11.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+.mini-x{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:#00000095;z-index:200;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border3);border-radius:18px;width:500px;max-width:96vw;padding:26px;max-height:92vh;overflow-y:auto;box-shadow:0 0 40px var(--blue-glow);}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+.modal-title{font-family:var(--font-h);font-size:20px;font-weight:800;color:var(--blue);text-shadow:0 0 12px var(--blue);}
+.modal-x{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;}
+.modal-x:hover{color:var(--text);}
+.drop{border:2px dashed var(--border3);border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;}
+.drop:hover,.drop.over{border-color:var(--blue);background:var(--bg3);box-shadow:inset 0 0 20px var(--blue-glow);}
+.drop-ic{font-size:34px;margin-bottom:8px;filter:drop-shadow(0 0 8px var(--blue));}
+.drop-lb{font-family:var(--font-h);font-size:15px;font-weight:600;margin-bottom:4px;}
+.drop-sub{font-size:12.5px;color:var(--text3);}
+.drop-sub b{color:var(--blue);}
+.drop-file{font-size:12px;color:var(--blue);margin-top:8px;font-weight:600;}
+#finput{display:none;}
+.prev-box{width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;margin-bottom:16px;display:none;border:1px solid var(--border3);}
+.prev-box video{width:100%;height:100%;object-fit:contain;display:block;}
+.fg{margin-bottom:13px;}
+.fl{font-size:12px;color:var(--text2);margin-bottom:5px;display:block;}
+.fi,.fsel,.fta{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 13px;color:var(--text);font-family:var(--font-b);font-size:13.5px;outline:none;transition:border-color .15s;}
+.fi:focus,.fta:focus{border-color:var(--blue);box-shadow:0 0 8px var(--blue-glow);}
+.fta{height:68px;resize:none;}
+.fsel{cursor:pointer;}
+.fsel option{background:var(--bg3);}
+.audience-row{display:flex;gap:10px;margin-bottom:10px;}
+.audience-opt{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;}
+.audience-opt:hover{border-color:var(--border3);}
+.audience-opt.sel{border-color:var(--blue);box-shadow:0 0 12px var(--blue-glow);background:var(--bg4);}
+.audience-ic{font-size:26px;margin-bottom:4px;}
+.audience-lb{font-family:var(--font-h);font-size:13px;font-weight:700;}
+.ai-verify-note{font-size:11.5px;color:var(--text3);line-height:1.6;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:16px;}
+
+.kids-badge{position:absolute;top:6px;right:7px;background:var(--green);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:9px;font-family:var(--font-h);}
+.mod-queue{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:22px;}
+.mod-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.mod-row:last-child{border-bottom:none;}
+.mod-title{flex:1;font-size:13px;}
+.mod-score{font-size:11.5px;color:var(--text3);}
+.mod-btn{border:none;border-radius:14px;padding:6px 12px;font-size:12px;font-family:var(--font-h);font-weight:700;cursor:pointer;}
+.mod-approve{background:var(--green);color:#000;}
+.mod-reject{background:var(--bg4);color:var(--text2);}
+
+.qual-row{display:flex;gap:8px;}
+.qual-opt{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 8px;text-align:center;cursor:pointer;font-size:12.5px;color:var(--text2);transition:all .15s;}
+.qual-opt b{display:block;font-family:var(--font-h);font-size:13px;color:var(--text);margin-bottom:2px;}
+.qual-opt.sel{border-color:var(--blue);background:var(--blue-glow);color:var(--blue);box-shadow:0 0 8px var(--blue-glow);}
+.qual-opt.sel b{color:var(--blue);}
+.prog-wrap{background:var(--bg4);border-radius:6px;height:4px;overflow:hidden;margin-bottom:6px;display:none;}
+.prog-bar{height:100%;background:var(--blue);width:0;transition:width .15s;box-shadow:0 0 8px var(--blue);}
+.chunk-status{font-size:11.5px;color:var(--text3);margin-bottom:12px;display:none;font-family:var(--font-b);white-space:pre-line;line-height:1.6;}
+.chunk-row{display:flex;gap:3px;margin-bottom:12px;display:none;}
+.chunk-cell{flex:1;height:6px;border-radius:3px;background:var(--bg4);transition:background .15s;}
+.chunk-cell.done{background:var(--blue);box-shadow:0 0 6px var(--blue);}
+.modal-ft{display:flex;gap:9px;justify-content:flex-end;}
+.btn-cancel{background:var(--bg3);border:1px solid var(--border2);border-radius:18px;padding:9px 18px;color:var(--text2);font-family:var(--font-h);font-size:13px;cursor:pointer;}
+.btn-pub{background:var(--blue);color:#000;border:none;border-radius:18px;padding:9px 22px;font-family:var(--font-h);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 0 12px var(--blue-glow);}
+.btn-pub:hover{background:#33ccff;}
+.btn-pub:disabled{opacity:.4;cursor:default;box-shadow:none;}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg3);border:1px solid var(--border3);border-left:3px solid var(--blue);border-radius:10px;padding:12px 18px;font-size:13.5px;z-index:400;transform:translateY(16px);opacity:0;transition:all .28s;pointer-events:none;box-shadow:0 0 16px var(--blue-glow);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ===== WATCHED PROGRESS LINE ===== */
+.thumb-progress-track{position:absolute;left:0;right:0;bottom:0;height:4px;background:#ffffff30;z-index:3;}
+.thumb-progress-fill{height:100%;background:var(--blue);box-shadow:0 0 6px var(--blue);}
+.s-vid-thumb .thumb-progress-track{height:3px;}
+.watched-tag{position:absolute;top:6px;right:7px;background:#000000cc;color:var(--blue);font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:8px;font-family:var(--font-h);letter-spacing:.5px;z-index:3;}
+
+/* ===== SHELF ROW WITH LEFT/RIGHT BUTTONS (no scrollbar) ===== */
+.shelf-row-wrap{position:relative;}
+.shelf-row{scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;}
+.shelf-row::-webkit-scrollbar{display:none;height:0;}
+.shelf-navbtn{position:absolute;top:0;bottom:10px;width:38px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--bg) 10%,#07070f00);border:none;color:var(--text);font-size:20px;cursor:pointer;z-index:4;opacity:0;transition:opacity .18s;}
+.shelf-row-wrap:hover .shelf-navbtn{opacity:1;}
+.shelf-navbtn.right{right:0;left:auto;background:linear-gradient(270deg,var(--bg) 10%,#07070f00);}
+.shelf-navbtn:hover{color:var(--blue);}
+
+/* ===== "TV" HOME SHELF LOOK ===== */
+.shelf{margin-bottom:34px;}
+.shelf-head{align-items:center;}
+.shelf-title{font-size:16.5px;display:flex;align-items:center;gap:8px;}
+.shelf-title::before{content:'';width:5px;height:16px;border-radius:3px;background:var(--blue);box-shadow:0 0 8px var(--blue);display:inline-block;}
+.shelf-card{width:280px;background:var(--bg2);border-radius:16px;}
+.shelf-card:hover{box-shadow:0 8px 30px var(--blue-glow);}
+.tv-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:1px;color:var(--blue);background:var(--blue-glow);border:1px solid var(--border3);border-radius:8px;padding:3px 8px;margin-bottom:8px;}
+.tv-badge::before{content:'●';color:var(--blue);font-size:9px;}
+
+/* ===== SIDEBAR: History / quick actions (replaces Library) ===== */
+.hist-btn{display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--text2);font-size:12.5px;cursor:pointer;border-radius:12px;margin-bottom:3px;transition:all .15s;border:1px solid transparent;}
+.hist-btn:hover{background:var(--bg3);color:var(--text);}
+.hist-btn.active{background:var(--blue-glow);color:var(--blue);border-color:var(--border3);}
+.hist-mini{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;border-radius:6px;margin:0 4px;position:relative;}
+.hist-mini:hover{background:var(--bg3);}
+.hist-mini-thumb{width:52px;height:30px;border-radius:4px;background:var(--bg4);overflow:hidden;flex-shrink:0;position:relative;border:1px solid var(--border2);}
+.hist-mini-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.hist-mini-title{font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.hist-clear{font-size:10.5px;color:var(--text3);cursor:pointer;padding:6px 18px;}
+.hist-clear:hover{color:var(--blue);}
+
+/* ===== TV-STYLE WATCH PAGE ===== */
+.pv-right{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:14px;}
+.tv-channel-card{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border3);border-radius:14px;padding:14px;margin-bottom:16px;box-shadow:0 0 18px var(--blue-glow);}
+.tv-channel-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;font-family:var(--font-h);background:linear-gradient(135deg,var(--blue),#0055aa);color:#000;flex-shrink:0;box-shadow:0 0 14px var(--blue-glow);}
+.un-card.playing{background:var(--blue-glow);border:1px solid var(--border3);}
+.un-card{border:1px solid transparent;}
+
+/* ===== UPLOAD MODAL: two-column field grid ===== */
+.up-modal{width:640px;}
+.up-section-lb{font-family:var(--font-h);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin:18px 0 8px;}
+.up-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fl .req{color:var(--blue);}
+.fl .opt{color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;}
+
+/* STUDIO */
+.studio-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.studio-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:26px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;}
+.stat-card .sv{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--blue);text-shadow:0 0 10px var(--blue-glow);}
+.stat-card .sl{font-size:12px;color:var(--text2);margin-top:4px;}
+.studio-chart-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:18px;margin-bottom:26px;}
+.studio-table{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;overflow:hidden;}
+.studio-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border2);}
+.studio-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.studio-table tr:last-child td{border-bottom:none;}
+.studio-vrow{display:flex;align-items:center;gap:10px;}
+.studio-thumb{width:64px;aspect-ratio:16/9;border-radius:5px;overflow:hidden;background:var(--bg4);flex-shrink:0;}
+.studio-thumb img{width:100%;height:100%;object-fit:cover;}
+.studio-vtitle{font-size:12.5px;font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.badge-q{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2);}
+.studio-del{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:5px 11px;font-size:11.5px;color:var(--text2);cursor:pointer;}
+.studio-del:hover{color:#ff4444;border-color:#ff444444;}
+.studio-nodel{font-size:11px;color:var(--text3);}
+
+/* ===== RESPONSIVE / PHONE MODE ===== */
+@media(max-width:860px){
+  aside{display:none;}
+  .pv.on{flex-direction:column;align-items:stretch;}
+  .pv-left{max-width:100%;flex:1 1 auto;}
+  .pv-right{width:100%;max-width:100%;min-width:0;}
+  .video-box{max-width:100%;}
+  .mini-player{width:150px;bottom:calc(10px + env(safe-area-inset-bottom));right:10px;}
+  .shelf-card{width:180px;}
+  .shelf-navbtn{opacity:1;width:28px;}
+  .up-modal{width:96vw;}
+  .up-grid2{grid-template-columns:1fr;}
+  .vf-vol-slider{width:48px;}
+  .vf-settings-menu{right:0;min-width:160px;}
+}
+@media(max-width:600px){
+  nav{padding:0 10px;gap:8px;height:54px;}
+  .logo{font-size:17px;}
+  .search-wrap{max-width:none;}
+  .search-wrap input{padding:7px 12px;font-size:12.5px;}
+  .btn-up{display:none;}
+  main{padding:14px 12px;padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+  .modal{padding:18px;border-radius:14px;}
+  .studio-table{font-size:11.5px;}
+  .studio-table th,.studio-table td{padding:8px 8px;}
+  .studio-vtitle{max-width:110px;}
+  .video-box{border-radius:0;}
+  .toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));}
+}
+
+/* =====================================================================
+   MOMENTS — horizontal story-style strip above the home feed
+   ===================================================================== */
+
+/* Strip container */
+.moments-strip{
+  margin-bottom:22px;
+  /* Hidden by default until JS confirms there is content to show */
+  display:none;
+}
+.moments-strip.visible{display:block;}
+
+/* Row header */
+.moments-header{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:10px;
+}
+.moments-header-title{
+  font-family:var(--font-h);font-size:13px;font-weight:700;
+  color:var(--text2);letter-spacing:.6px;text-transform:uppercase;
+}
+.moments-header-title span{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--blue);box-shadow:0 0 6px var(--blue);
+  margin-right:5px;vertical-align:middle;
+}
+
+/* Scrollable row of bubbles */
+.moments-row{
+  display:flex;gap:14px;
+  overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:none;-ms-overflow-style:none;
+  scroll-snap-type:x proximity;
+}
+.moments-row::-webkit-scrollbar{display:none;}
+
+/* Individual bubble */
+.moment-bubble{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  flex:0 0 auto;width:66px;cursor:pointer;scroll-snap-align:start;
+  transition:transform .15s;
+}
+.moment-bubble:hover{transform:scale(1.06);}
+.moment-bubble:active{transform:scale(0.96);}
+
+/* Ring around the avatar — colour shows unseen vs seen vs own */
+.moment-ring{
+  width:58px;height:58px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  padding:2.5px;
+  /* Default: no moments, neutral border */
+  background:var(--bg4);
+  transition:background .2s;
+  position:relative;
+}
+/* Unseen Moment: vivid gradient ring */
+.moment-ring.unseen{
+  background:linear-gradient(135deg,var(--blue) 0%,#7c3aed 50%,var(--green) 100%);
+  box-shadow:0 0 14px var(--blue-glow);
+}
+/* Seen Moment: muted grey ring */
+.moment-ring.seen{
+  background:var(--bg5);
+}
+/* Own Moment (regardless of seen state) */
+.moment-ring.own{
+  background:linear-gradient(135deg,var(--blue) 0%,#0088cc 100%);
+  box-shadow:0 0 10px var(--blue-glow);
+}
+/* Add-new bubble (no existing Moment) */
+.moment-ring.add-new{
+  background:var(--bg3);
+  border:2px dashed var(--border3);
+  box-shadow:none;
+}
+.moment-ring.add-new:hover{border-color:var(--blue);background:var(--bg4);}
+
+/* Inner circle — profile photo or initials */
+.moment-inner{
+  width:50px;height:50px;border-radius:50%;
+  background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-h);font-size:16px;font-weight:700;
+  color:var(--blue);overflow:hidden;
+  border:2px solid var(--bg);  /* creates gap between inner circle and ring */
+}
+.moment-inner img{
+  width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;
+}
+/* "+" icon inside the add-new bubble */
+.moment-add-icon{
+  font-size:22px;color:var(--blue);line-height:1;
+  text-shadow:0 0 8px var(--blue);
+}
+
+/* Name label under each bubble */
+.moment-name{
+  font-size:10.5px;color:var(--text2);
+  text-align:center;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;
+  max-width:66px;line-height:1.2;
+}
+.moment-name.own-label{color:var(--blue);font-weight:600;}
+
+/* =====================================================================
+   MOMENT CREATE MODAL
+   ===================================================================== */
+.moment-create-overlay{
+  display:none;position:fixed;inset:0;
+  background:#000000bb;z-index:300;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.moment-create-overlay.open{display:flex;}
+.moment-create-modal{
+  background:var(--bg2);border:1px solid var(--border3);
+  border-radius:20px;width:420px;max-width:96vw;
+  padding:28px 24px;
+  box-shadow:0 0 50px var(--blue-glow);
+  position:relative;
+  max-height:92vh;overflow-y:auto;
+}
+.moment-create-title{
+  font-family:var(--font-h);font-size:18px;font-weight:800;
+  color:var(--blue);margin-bottom:20px;
+  text-shadow:0 0 10px var(--blue);
+}
+.moment-create-close{
+  position:absolute;top:18px;right:18px;
+  background:none;border:none;color:var(--text2);
+  font-size:22px;cursor:pointer;line-height:1;
+}
+.moment-create-close:hover{color:var(--text);}
+
+/* Drop zone */
+.moment-drop{
+  border:2px dashed var(--border3);border-radius:14px;
+  padding:32px 20px;text-align:center;cursor:pointer;
+  transition:all .2s;margin-bottom:18px;
+}
+.moment-drop:hover,.moment-drop.over{
+  border-color:var(--blue);background:var(--bg3);
+  box-shadow:inset 0 0 20px var(--blue-glow);
+}
+.moment-drop-icon{font-size:32px;margin-bottom:8px;filter:drop-shadow(0 0 8px var(--blue));}
+.moment-drop-label{font-family:var(--font-h);font-size:14px;font-weight:600;margin-bottom:4px;}
+.moment-drop-sub{font-size:12px;color:var(--text3);}
+.moment-drop-sub b{color:var(--blue);}
+#moment-file-input{display:none;}
+
+/* Preview */
+.moment-preview-wrap{
+  width:100%;border-radius:12px;overflow:hidden;
+  background:#000;margin-bottom:16px;
+  display:none;
+  position:relative;max-height:340px;
+}
+.moment-preview-wrap img,.moment-preview-wrap video{
+  width:100%;max-height:340px;object-fit:contain;display:block;
+}
+.moment-preview-replace{
+  position:absolute;top:8px;right:8px;
+  background:#000000bb;border:1px solid var(--border3);
+  border-radius:18px;padding:5px 12px;
+  color:var(--text);font-size:12px;cursor:pointer;
+  transition:all .15s;
+}
+.moment-preview-replace:hover{background:var(--blue);color:#000;}
+
+/* Action buttons */
+.moment-create-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:4px;}
+.moment-cancel-btn{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:18px;padding:9px 18px;
+  color:var(--text2);font-family:var(--font-h);font-size:13px;cursor:pointer;
+}
+.moment-share-btn{
+  background:var(--blue);color:#000;border:none;
+  border-radius:18px;padding:9px 22px;
+  font-family:var(--font-h);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 0 12px var(--blue-glow);
+}
+.moment-share-btn:hover{background:#33ccff;}
+.moment-share-btn:disabled{opacity:.4;cursor:default;box-shadow:none;}
+.moment-upload-status{
+  font-size:12px;color:var(--text2);text-align:center;
+  margin-top:8px;min-height:18px;
+}
+
+/* =====================================================================
+   MOMENT VIEWER — full-screen premium viewer
+   ===================================================================== */
+.moment-viewer-overlay{
+  display:none;position:fixed;inset:0;
+  background:#000000f0;z-index:400;
+  flex-direction:column;
+  backdrop-filter:blur(4px);
+}
+.moment-viewer-overlay.open{display:flex;}
+
+/* Progress bars at the very top (one per Moment in the set) */
+.mv-progress-row{
+  display:flex;gap:3px;padding:14px 14px 0;
+  position:absolute;top:0;left:0;right:0;z-index:5;
+}
+.mv-prog-seg{
+  flex:1;height:3px;border-radius:2px;
+  background:#ffffff30;overflow:hidden;
+}
+.mv-prog-fill{
+  height:100%;background:#fff;
+  border-radius:2px;width:0%;
+  transition:width linear;
+}
+
+/* Header: avatar + name + time + close */
+.mv-header{
+  position:absolute;top:0;left:0;right:0;z-index:4;
+  display:flex;align-items:center;gap:10px;
+  padding:28px 14px 10px;
+  background:linear-gradient(180deg,#000000cc 0%,transparent 100%);
+}
+.mv-av{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;font-family:var(--font-h);
+  background:linear-gradient(135deg,var(--blue),#0055aa);
+  color:#000;flex-shrink:0;overflow:hidden;
+  border:2px solid #ffffff44;
+}
+.mv-av img{width:100%;height:100%;object-fit:cover;display:block;}
+.mv-info{flex:1;min-width:0;}
+.mv-name{font-size:14px;font-weight:600;color:#fff;font-family:var(--font-h);}
+.mv-time{font-size:11.5px;color:#ffffffaa;}
+.mv-close{
+  background:#00000066;border:1px solid #ffffff22;
+  border-radius:50%;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;
+  transition:background .15s;
+}
+.mv-close:hover{background:#00000099;}
+
+/* Media area fills remaining space */
+.mv-media{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.mv-media img,.mv-media video{
+  max-width:100%;max-height:100%;
+  object-fit:contain;display:block;
+  user-select:none;-webkit-user-select:none;
+  user-drag:none;
+}
+
+/* Left/right tap zones for navigating */
+.mv-tap-left,.mv-tap-right{
+  position:absolute;top:0;bottom:0;width:40%;
+  z-index:3;cursor:pointer;
+  /* invisible but tappable */
+}
+.mv-tap-left{left:0;}
+.mv-tap-right{right:0;}
+
+/* Footer: viewer count or placeholder */
+.mv-footer{
+  position:absolute;bottom:0;left:0;right:0;z-index:4;
+  padding:10px 18px 26px;
+  background:linear-gradient(0deg,#000000cc 0%,transparent 100%);
+  display:flex;align-items:center;gap:8px;
+}
+.mv-views{
+  font-size:13px;color:#ffffffcc;display:flex;align-items:center;gap:5px;
+}
+.mv-views-icon{font-size:15px;}
+
+/* Swipe-down hint (purely visual) */
+.mv-swipe-hint{
+  text-align:center;font-size:10.5px;color:#ffffff55;
+  position:absolute;bottom:8px;left:0;right:0;z-index:4;
+  pointer-events:none;
+}
+
+/* Kids mode: hide Moments strip (keep it simple for kids) */
+body.kids-mode .moments-strip{display:none !important;}
+
+/* Responsive tweaks */
+@media(max-width:600px){
+  .moment-bubble{width:58px;}
+  .moment-ring{width:52px;height:52px;}
+  .moment-inner{width:44px;height:44px;font-size:14px;}
+  .moments-row{gap:10px;}
+  .moment-name{font-size:10px;max-width:58px;}
+  .mv-header{padding:24px 10px 8px;}
+  .mv-av{width:30px;height:30px;font-size:11px;}
+  .mv-name{font-size:13px;}
+  .mv-close{width:28px;height:28px;font-size:16px;}
+}
+</style>
+
+<!-- ===== APP ===== -->
+<!-- Sign-in is now handled by /login.html (Firebase Auth).
+     dashboard.html is only served to authenticated users. -->
+<div id="app-root" style="display:block;">
+<nav>
+  <div class="logo" onclick="goHome()">VID<em>flow</em><span id="logo-kids-suffix" style="display:none;font-family:var(--logo-font);"> Kids</span></div>
+  <div class="search-wrap" id="search-wrap">
+    <input type="text" id="srch" placeholder="Search your videos…" onkeydown="if(event.key==='Enter')doSearch()"/>
+    <button onclick="doSearch()">&#128269;</button>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <div class="nav-icon-btn" id="studio-nav-btn" title="VIDflow Studio" onclick="openStudio()">&#128202;</div>
+    <div class="nav-av" id="nav-av" onclick="openMyProfile()" title="Profile">U</div>
+  </div>
+</nav>
+
+<div class="wrap" id="wrap">
+<aside id="aside">
+  <div id="aside-general">
+    <div class="s-link active" id="sl-home" onclick="goHome()"><span style="font-size:15px;">&#127968;</span> Home</div>
+    <div class="s-link" id="sl-foryou" onclick="openForYouFeed()"><span style="font-size:15px;">&#10024;</span> For You</div>
+    <div class="s-link" id="sl-music" onclick="setCat('Music',null)"><span style="font-size:15px;">&#127925;</span> Music</div>
+    <div class="s-link" onclick="openStudio()"><span style="font-size:15px;">&#128202;</span> VIDflow Studio</div>
+    <div class="s-sep"></div>
+    <div class="s-head">You</div>
+    <div class="hist-btn" id="hb-continue" onclick="openContinueWatching()"><span style="font-size:14px;">&#9199;</span> Continue Watching</div>
+    <div class="hist-btn" id="hb-history" onclick="openHistoryView()"><span style="font-size:14px;">&#128337;</span> History</div>
+    <div class="hist-btn" id="hb-liked" onclick="openLikedView()"><span style="font-size:14px;">&#128077;</span> Liked Videos</div>
+    <div class="hist-btn" id="hb-subs" onclick="openSubsView()"><span style="font-size:14px;">&#128101;</span> Subscriptions</div>
+    <div class="s-sep"></div>
+    <div class="s-head" id="sh-recent">Recently Watched</div>
+    <div id="sidebar-list"></div>
+    <div class="hist-clear" onclick="clearWatchHistoryData()">Clear watch history</div>
+  </div>
+  <!-- Kids Feed gets its own short, simple nav — no Studio, no History, no
+       category browsing into General content. Just a way back "up" and
+       out. This is the "simpler navigation layout" the Kids theme calls for. -->
+  <div id="aside-kids" style="display:none;">
+    <div class="s-link active" id="sl-kids-home" onclick="openKidsFeed()"><span style="font-size:15px;">&#128118;</span> Kids Home</div>
+    <div class="s-sep"></div>
+    <div class="s-link" onclick="exitKidsMode()"><span style="font-size:15px;">&#128682;</span> Exit Kids Mode</div>
+  </div>
+</aside>
+<main id="main">
+  <div id="home-view">
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">&#127909;</div>
+      <div class="empty-title">Welcome to VIDflow</div>
+      <div class="empty-sub">Upload — it will show up here and you can watch it instantly.</div>
+      <button class="btn-big" onclick="openModal()">+ Upload </button>
+    </div>
+    <div id="has-content" style="display:none;">
+      <!-- ── MOMENTS STRIP ───────────────────────────────────────── -->
+      <div class="moments-strip" id="moments-strip">
+        <div class="moments-header">
+          <div class="moments-header-title"><span></span>Moments</div>
+        </div>
+        <div class="moments-row" id="moments-row"></div>
+      </div>
+      <!-- ────────────────────────────────────────────────────────── -->
+      <div class="cats" id="cats"></div>
+      <div id="shelves-wrap"></div>
+      <div id="grid-wrap" style="display:none;">
+        <div class="sec-title" id="sec-title">All Videos</div>
+        <div class="grid" id="vgrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pv" id="pv">
+    <div class="pv-left">
+      <div class="video-box paused" id="video-box">
+        <video id="main-vid" playsinline autoplay style="cursor:pointer;" onclick="vfTogglePlay()"></video>
+        <div class="vb-navbtn vb-prev" onclick="playPrev()" title="Previous video">&#8592;</div>
+        <div class="vb-navbtn vb-next" onclick="playNext()" title="Next video">&#8594;</div>
+
+        <!-- Legacy quality-wrap kept but hidden via CSS (.quality-wrap{display:none!important}) -->
+        <div class="quality-wrap" id="quality-wrap-legacy" style="display:none;">
+          <div class="quality-menu" id="quality-menu"></div>
+        </div>
+
+        <!-- Custom VidFlow Controls -->
+        <div class="vf-controls" id="vf-controls">
+          <!-- Timeline -->
+          <div class="vf-timeline" id="vf-timeline">
+            <div class="vf-track" id="vf-track">
+              <div class="vf-buffered" id="vf-buffered"></div>
+              <div class="vf-progress" id="vf-progress"></div>
+              <div class="vf-thumb" id="vf-thumb"></div>
+            </div>
+          </div>
+          <!-- Bottom bar -->
+          <div class="vf-bar">
+            <button class="vf-btn" id="vf-play-btn" onclick="vfTogglePlay()" title="Play/Pause">&#9654;</button>
+            <div class="vf-vol-wrap">
+              <button class="vf-btn" id="vf-mute-btn" onclick="vfToggleMute()" title="Mute">&#128266;</button>
+              <input type="range" class="vf-vol-slider" id="vf-vol" min="0" max="1" step="0.02" value="1" oninput="vfSetVolume(this.value)" title="Volume"/>
+            </div>
+            <span class="vf-time" id="vf-time">0:00 / 0:00</span>
+            <div class="vf-spacer"></div>
+            <!-- Settings button -->
+            <div class="vf-settings-wrap" id="vf-settings-wrap">
+              <button class="vf-btn" id="vf-settings-btn" onclick="vfToggleSettings(event)" title="Settings">&#9881;</button>
+              <div class="vf-settings-menu" id="vf-settings-menu">
+                <div class="vf-settings-section">
+                  <div class="vf-settings-header">Quality</div>
+                  <div id="vf-quality-list"></div>
+                </div>
+                <div class="vf-settings-sep"></div>
+                <div class="vf-settings-section">
+                  <div class="vf-settings-header">Playback Speed</div>
+                  <div id="vf-speed-list"></div>
+                </div>
+              </div>
+            </div>
+            <button class="vf-btn" id="vf-fs-btn" onclick="vfToggleFullscreen()" title="Fullscreen">&#x26F6;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt" id="pv-title"></div>
+      <div class="p-meta">
+        <div class="acts">
+          <button class="act" id="btn-like" onclick="toggleLike()">&#128077; <span id="lc">0</span></button>
+          <button class="act" id="btn-autoplay" onclick="toggleAutoplay()">&#9654; Autoplay: <span id="ap-state">ON</span></button>
+          <button class="act" id="btn-report" onclick="reportVideo()" title="Report incorrect audience/category">&#128681; Report</button>
+        </div>
+      </div>
+      <div class="tv-channel-card">
+        <div class="tv-channel-av" id="pv-av" onclick="openUploaderProfile()" style="cursor:pointer;">V</div>
+        <div style="flex:1;min-width:0;">
+          <div class="p-cn" id="pv-cn" onclick="openUploaderProfile()" style="cursor:pointer;"></div>
+          <div class="p-cs" id="pv-sub-count">Channel</div>
+        </div>
+        <button class="btn-sub" id="btn-sub" onclick="toggleSub()">FOLLOW</button>
+      </div>
+      <div class="desc-box">
+        <div class="desc-stats" id="pv-stats"></div>
+        <div class="desc-txt" id="pv-desc"></div>
+      </div>
+      <div class="cmts">
+        <div class="cmts-head" id="cmts-head">Comments</div>
+        <div class="cmt-inp-row">
+          <div class="user-av" id="cmt-av">U</div>
+          <input class="cmt-inp" id="cmt-inp" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')postComment()"/>
+          <button class="btn-cmt" onclick="postComment()">Post</button>
+        </div>
+        <div id="cmts-list"></div>
+      </div>
+    </div>
+    <div class="pv-right">
+      <div class="tv-badge">ON NOW</div>
+      <div class="un-title" id="un-title">Up Next</div>
+      <div id="up-next"></div>
+    </div>
+  </div>
+
+  <div id="studio-view" style="display:none;">
+    <div class="studio-head">
+      <div>
+        <div class="sec-title" style="margin:0;">VIDflow Studio</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Showing analytics for your account only</div>
+      </div>
+      <button class="btn-up" onclick="openModal()">+ Upload</button>
+    </div>
+    <div class="studio-stats" id="studio-stats"></div>
+    <div class="mod-queue" id="mod-queue" style="display:none;">
+      <div style="font-family:var(--font-h);font-size:13px;color:var(--blue);margin-bottom:6px;">Kids Feed — Review Queue</div>
+      <div style="font-size:11.5px;color:var(--text3);margin-bottom:10px;">These uploads were borderline for the AI classifier (60–79 confidence) or were community-reported. Approve to publish in the Kids Feed, or reject to keep them in the General feed.</div>
+      <div id="mod-list"></div>
+    </div>
+    <div class="studio-chart-box">
+      <div style="font-family:var(--font-h);font-size:13px;color:var(--text2);margin-bottom:12px;">Views by video</div>
+      <div id="studio-chart"></div>
+    </div>
+    <table class="studio-table">
+      <thead><tr><th>Video</th><th>Views</th><th>Likes</th><th>Comments</th><th>Quality</th><th>Type</th><th>Uploaded</th><th></th></tr></thead>
+      <tbody id="studio-tbody"></tbody>
+    </table>
+  </div>
+</main>
+</div>
+</div>
+
+<!-- Mini / background player -->
+<div class="mini-player" id="mini-player">
+  <video id="mini-vid" muted></video>
+  <div class="mini-bar">
+    <div class="mini-title" id="mini-title">Playing…</div>
+    <button class="mini-x" onclick="closeMiniPlayer()">&times;</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal up-modal">
+    <div class="modal-hd">
+      <div class="modal-title">Publish a Video</div>
+      <button class="modal-x" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="drop" id="drop-zone"
+      onclick="document.getElementById('finput').click()"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="onDrop(event)">
+      <div class="drop-ic">&#127909;</div>
+      <div class="drop-lb">Drag & drop your video here</div>
+      <div class="drop-sub">or <b>browse files</b> — MP4, WebM, MOV, AVI. Full movies & long-form video supported.</div>
+      <div class="drop-file" id="drop-fname"></div>
+    </div>
+    <input type="file" id="finput" accept="video/*" onchange="pickFile(this.files[0])"/>
+    <div class="prev-box" id="prev-box">
+      <video id="prev-vid" muted preload="metadata" playsinline></video>
+    </div>
+
+    <div class="up-section-lb">Required — used first for recommendations</div>
+    <div class="fg"><label class="fl"><span class="req">Title *</span></label><input class="fi" id="up-title" placeholder="A clear, specific title helps the algorithm the most"/></div>
+    <div class="fg"><label class="fl"><span class="req">Category *</span></label>
+      <select class="fsel" id="up-cat">
+        <option value="">Select a category…</option>
+        <option>Movies</option><option>Music</option><option>Gaming</option><option>Education</option>
+        <option>Tech</option><option>Travel</option><option>Comedy</option>
+        <option>Sports</option><option>Vlog</option><option>Other</option>
+      </select>
+    </div>
+
+    <div class="up-section-lb">Optional — sharpens your recommendations, but not required</div>
+    <div class="fg"><label class="fl">Description <span class="opt">(optional)</span></label><textarea class="fta" id="up-desc" placeholder="What's this video about?"></textarea></div>
+
+    <div class="up-section-lb">Audience Selection</div>
+    <div class="audience-row">
+      <div class="audience-opt sel" id="aud-general" onclick="setAudience('general')">
+        <div class="audience-ic">&#127757;</div>
+        <div class="audience-lb">General</div>
+      </div>
+      <div class="audience-opt" id="aud-kids" onclick="setAudience('kids')">
+        <div class="audience-ic">&#128118;</div>
+        <div class="audience-lb">For Kids</div>
+      </div>
+    </div>
+    <div class="ai-verify-note" style="border-left:3px solid var(--blue);margin-bottom:10px;">
+      <b>🚀 Server Upload Mode:</b> videos are uploaded to VidFlow servers and processed with FFmpeg before publishing.
+    </div>
+    <div class="ai-verify-note">
+      <b>AI Verification:</b> every upload is scanned against its title, description and category to check it's really made for children before it can appear in the Kids Feed. High-confidence matches publish straight to Kids; borderline ones wait for a quick manual review; anything with mature signals is kept out of Kids regardless of what's selected here.
+    </div>
+
+    <div class="fg">
+      <label class="fl">Upload quality</label>
+      <div class="qual-row">
+        <div class="qual-opt sel" id="q-low" onclick="setQuality('low')"><b>Low</b>up to 480p · faster chunked upload</div>
+        <div class="qual-opt" id="q-high" onclick="setQuality('high')"><b>High</b>up to 1080p · full quality chunks</div>
+      </div>
+    </div>
+    <div class="chunk-status" id="chunk-status">Uploading chunk 0 / 0…</div>
+    <div class="chunk-row" id="chunk-row"></div>
+    <div class="prog-wrap" id="prog-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-pub" id="btn-pub" onclick="publishVideo()" disabled>Publish</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast-el"></div>
+
+<!-- ================================================================
+     MOMENT CREATE MODAL
+     ================================================================ -->
+<div class="moment-create-overlay" id="moment-create-overlay">
+  <div class="moment-create-modal">
+    <div class="moment-create-title">✨ Share a Moment</div>
+    <button class="moment-create-close" onclick="closeMomentCreate()">&times;</button>
+
+    <div class="moment-drop" id="moment-drop"
+      onclick="document.getElementById('moment-file-input').click()"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="onMomentDrop(event)">
+      <div class="moment-drop-icon">📸</div>
+      <div class="moment-drop-label">Drop a photo or short video</div>
+      <div class="moment-drop-sub">or <b>browse files</b> — JPG, PNG, GIF, MP4, MOV · max 60 sec video</div>
+    </div>
+    <input type="file" id="moment-file-input" accept="image/*,video/*" onchange="onMomentFilePick(this.files[0])"/>
+
+    <div class="moment-preview-wrap" id="moment-preview-wrap">
+      <img id="moment-preview-img" style="display:none;" alt="Moment preview"/>
+      <video id="moment-preview-vid" muted playsinline loop style="display:none;"></video>
+      <button class="moment-preview-replace" onclick="document.getElementById('moment-file-input').click()">Replace</button>
+    </div>
+
+    <div class="moment-create-actions">
+      <button class="moment-cancel-btn" onclick="closeMomentCreate()">Cancel</button>
+      <button class="moment-share-btn" id="moment-share-btn" onclick="shareMoment()" disabled>Share Moment</button>
+    </div>
+    <div class="moment-upload-status" id="moment-upload-status"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     MOMENT VIEWER
+     ================================================================ -->
+<div class="moment-viewer-overlay" id="moment-viewer-overlay">
+  <!-- Top progress segments (built dynamically) -->
+  <div class="mv-progress-row" id="mv-progress-row"></div>
+
+  <!-- Header -->
+  <div class="mv-header">
+    <div class="mv-av" id="mv-av"></div>
+    <div class="mv-info">
+      <div class="mv-name" id="mv-name"></div>
+      <div class="mv-time" id="mv-time"></div>
+    </div>
+    <div class="mv-close" onclick="closeMomentViewer()">✕</div>
+  </div>
+
+  <!-- Media -->
+  <div class="mv-media" id="mv-media">
+    <img id="mv-img" style="display:none;" alt="Moment"/>
+    <video id="mv-vid" playsinline style="display:none;"></video>
+    <!-- Tap zones -->
+    <div class="mv-tap-left" onclick="mvNavigate(-1)"></div>
+    <div class="mv-tap-right" onclick="mvNavigate(1)"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mv-footer">
+    <div class="mv-views" id="mv-views"></div>
+  </div>
+</div>
+
+<script>
+let videos=[];
+let currentId=null;
+let uploadFile=null;
+// ── Guest Mode helpers ────────────────────────────────────────────────────────
+function isGuest(){
+  return !currentUser && localStorage.getItem('vf_guest')==='1';
+}
+
+function guestBlock(featureName){
+  if(!isGuest()) return false;
+
+  if(confirm('⚠️ ' + featureName + ' requires a VIDflow account.\n\nSign up or log in now?')){
+    localStorage.removeItem('vf_guest');
+    window.location.href='/login.html';
+  }
+
+  return true;
+}
+let uploadQuality='low';
+let liked=new Set();
+let subbed=new Set(); // now holds CHANNEL OWNER EMAILS the current account follows (real, per-account, server-backed)
+let catFilter='All';
+let autoplayOn=true;
+let currentUser=null;
+let miniActive=false;
+let uploadAudience='general'; // 'general' | 'kids'
+let watchHistory=[]; // stack of video ids visited, for Previous button
+let sidebarMode='recent'; // 'recent' | 'history' | 'liked' | 'subs'
+let kidsMode=false; // true while viewing the Kids Feed
+const sessionRandomMap={}; // stable per-pageload random value per video, used to "surface" older items on refresh
+const channelSubCache={}; // ownerEmail -> subscriber count, refreshed on demand
+
+const QUALITY_LADDER=[144,240,360,480,720,1080];
+
+/* =====================================================================
+   FEED SEPARATION — Kids Feed and General Feed each get their own
+   recommendation pool and their own autoplay queue. Nothing below ever
+   ranks or queues a video against a video from the other feed.
+   ===================================================================== */
+let kidsQueue=[];          // videos queued up next, Kids Feed only
+let generalQueue=[];       // videos queued up next, General Feed only
+let kidsQueuePlayed=new Set();    // ids already surfaced this Kids session (avoids repeats until the pool cycles)
+let generalQueuePlayed=new Set(); // same, for General
+const QUEUE_TARGET=40; // keep 20–50 videos ready per feed; we aim for the middle of that range
+
+/* =====================================================================
+   SERVER-BACKED API LAYER — all calls go to the Node.js backend.
+   ===================================================================== */
+
+async function apiGetVideos(){
+  const r=await fetch('/api/videos');
+  if(!r.ok)return[];
+  return r.json();
+}
+async function apiPatchVideo(id,patch){
+  const r=await fetch('/api/videos/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
+  if(!r.ok)return null;
+  return r.json();
+}
+async function apiDeleteVideo(id){
+  await fetch('/api/videos/'+id,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({requesterEmail:currentUser&&currentUser.email})});
+}
+async function apiRegisterView(id,viewerEmail){
+  const r=await fetch('/api/videos/'+id+'/view',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({viewerEmail})});
+  if(!r.ok)return null;
+  return r.json();
+}
+async function apiReport(id,reporterEmail,reason){
+  const r=await fetch('/api/videos/'+id+'/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reporterEmail,reason})});
+  return r.json();
+}
+async function apiGetSubscribers(ownerEmail){
+  const r=await fetch('/api/subscribers/'+encodeURIComponent(ownerEmail));
+  if(!r.ok)return{count:0,subscribers:[]};
+  return r.json();
+}
+async function apiGetMySubscriptions(subscriberEmail){
+  const r=await fetch('/api/subscriptions/'+encodeURIComponent(subscriberEmail));
+  if(!r.ok)return{owners:[]};
+  return r.json();
+}
+async function apiSubscribe(subscriber,owner){
+  const r=await fetch('/api/subscriptions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscriber,owner})});
+  return r.json();
+}
+async function apiUnsubscribe(subscriber,owner){
+  const r=await fetch('/api/subscriptions',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscriber,owner})});
+  return r.json();
+}
+async function apiGetModQueue(){
+  const r=await fetch('/api/moderation/queue');
+  if(!r.ok)return[];
+  return r.json();
+}
+async function apiModerate(id,approve){
+  const r=await fetch('/api/videos/'+id+'/moderate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({approve})});
+  return r.json();
+}
+async function apiGetAccounts(){
+  const r=await fetch('/api/accounts');
+  if(!r.ok)return[];
+  return r.json();
+}
+async function apiAddAccount(a){return a;}
+async function apiDeleteAccount(email){
+  await fetch('/api/accounts/'+encodeURIComponent(email),{method:'DELETE'});
+}
+
+/* ===== ACTIVITY TRACKING ===== */
+async function apiTrackWatch(videoId,watchSeconds,completed){
+  if(!currentUser)return;
+  fetch('/api/activity/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userEmail:currentUser.email,videoId,watchSeconds,completed})}).catch(()=>{});
+}
+async function apiTrackLike(videoId,liked){
+  if(!currentUser)return;
+  fetch('/api/activity/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userEmail:currentUser.email,videoId,liked})}).catch(()=>{});
+}
+async function apiTrackFollow(ownerEmail,following){
+  if(!currentUser)return;
+  fetch('/api/activity/follow',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userEmail:currentUser.email,ownerEmail,following})}).catch(()=>{});
+}
+async function apiFetchRecommendations(limit){
+  if(!currentUser)return[];
+  const feed=kidsMode?'kids':'general';
+  const r=await fetch('/api/recommendations?userEmail='+encodeURIComponent(currentUser.email)+'&limit='+(limit||30)+'&feed='+feed);
+  if(!r.ok)return[];
+  return r.json();
+}
+
+/* No-op: metadata is authoritative on the server; local array is updated in-place after each PATCH. */
+function saveVideosMeta(id){}
+
+/* Poll the server every 30 s so videos uploaded from another device appear automatically. */
+async function pollForUpdates(){
+  try{
+    const fresh=await apiGetVideos();
+
+    if(Array.isArray(fresh)){
+      videos=fresh;
+
+      const player=document.getElementById('pv');
+      const isWatching=player && player.classList.contains('on');
+
+      if(!isWatching){
+        renderAll();
+      }
+    }
+  }catch(e){}
+}
+
+async function loadVideosFromServer(){
+  try{videos=await apiGetVideos();}catch(e){videos=[];}
+}
+// Videos are loaded inside enterApp() which is called by bootFromSession() below
+
+/* ===== AUTH — reads the Firebase session that /login.html already created ===== */
+async function bootFromSession(){
+  try{
+    const r=await fetch('/api/me');
+    const me=await r.json();
+
+    if(!me.loggedIn){
+      if(localStorage.getItem('vf_guest')==='1'){
+        currentUser=null; // guest — no account
+      } else {
+        window.location.href='/login.html';
+        return;
+      }
+    } else {
+      currentUser={
+        name:me.displayName||me.email||'VIDflow User',
+        email:me.email||'',
+        uid:me.uid||'',
+        photoURL:me.photoURL||null,
+        initials:initials(me.displayName||me.email||'V')
+      };
+    }
+  }catch(e){
+    if(localStorage.getItem('vf_guest')==='1'){
+      currentUser=null;
+    } else {
+      window.location.href='/login.html';
+      return;
+    }
+  }
+
+  await enterApp();
+  // Load Moments after the main app is fully booted and currentUser is set
+  loadAndRenderMoments().catch(()=>{});
+  setInterval(pollForUpdates,30000);
+  // If arriving from a profile page with ?play=<id>, open that video immediately
+  const _playId = new URLSearchParams(location.search).get('play');
+  if (_playId) openVideo(_playId);
+}
+async function enterApp(){
+  if(currentUser){
+    const avEl=document.getElementById('nav-av');
+    avEl.textContent=currentUser.initials;
+    avEl.style.backgroundImage='';
+    avEl.style.backgroundSize='';
+    fetch('/api/profile/'+encodeURIComponent(currentUser.email))
+      .then(r=>r.ok?r.json():null)
+      .then(p=>{
+        if(p&&p.avatar){
+          avEl.textContent='';
+          avEl.style.backgroundImage='url('+p.avatar+')';
+          avEl.style.backgroundSize='cover';
+          avEl.style.backgroundPosition='center';
+          avEl.style.backgroundRepeat='no-repeat';
+        }
+      }).catch(()=>{});
+    document.getElementById('cmt-av').textContent=currentUser.initials;
+    const mySubs=await apiGetMySubscriptions(currentUser.email);
+    subbed=new Set(mySubs.owners||[]);
+  } else {
+    // Guest: show a generic avatar initial and skip subscription fetch
+    const avEl=document.getElementById('nav-av');
+    avEl.textContent='G';
+    document.getElementById('cmt-av').textContent='G';
+  }
+  await loadVideosFromServer();
+  renderAll();
+}
+async function signOut(){
+  // In offline mode, "sign out" just reloads the page
+  if(!confirm('Reset VIDflow? This will reload the page.'))return;
+  closeMiniPlayer();
+  document.getElementById('main-vid').pause();
+  window.location.reload();
+}
+// Boot the app on page load
+bootFromSession();
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmtN(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(0)+'K';return String(n);}
+function fmtDur(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+(ss<10?'0':'')+ss;}
+function timeAgo(ts){const d=(Date.now()-ts)/1000;if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+function initials(n){return(n||'V').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function isOwner(v){return v && currentUser && v.uploaderEmail===currentUser.email;}
+
+/* A video's feed is 'kids' ONLY if the server-side AI classifier actually
+   approved it (v.feed==='kids'); everything else — including anything
+   pending review — counts as 'general'. This is the single source of
+   truth every filter below uses, so Kids and General never disagree. */
+function feedOf(v){ return (v && v.feed==='kids') ? 'kids' : 'general'; }
+function generalPool(){ return videos.filter(v=>feedOf(v)==='general'); }
+function kidsPool(){ return videos.filter(v=>feedOf(v)==='kids'); }
+
+/* Central switch for entering/leaving Kids Mode. Every place that used to
+   just assign kidsMode=true/false now calls this instead, so the theme,
+   the sidebar, and the nav chrome can never fall out of sync with it. */
+function setKidsMode(on){
+  kidsMode=!!on;
+  document.body.classList.toggle('kids-mode',kidsMode);
+  const asideG=document.getElementById('aside-general'),asideK=document.getElementById('aside-kids');
+  if(asideG)asideG.style.display=kidsMode?'none':'block';
+  if(asideK)asideK.style.display=kidsMode?'block':'none';
+  const suffix=document.getElementById('logo-kids-suffix');
+  if(suffix)suffix.style.display=kidsMode?'inline':'none';
+  // Simpler nav in Kids Mode: no search bar, no Studio/upload access.
+  const sw=document.getElementById('search-wrap'),sb=document.getElementById('studio-nav-btn');
+  if(sw)sw.style.display=kidsMode?'none':'flex';
+  if(sb)sb.style.display=kidsMode?'none':'flex';
+  const cats=document.getElementById('cats');
+  if(cats)cats.style.display=kidsMode?'none':'flex';
+}
+function exitKidsMode(){ goHome(); }
+
+/* ===== SONG vs LONG-FORM CLASSIFICATION =====
+   A video counts as a "song" if its title flags it as a music video, OR
+   its runtime is 5:35 or shorter. Anything else counts as long-form
+   (movies, episodes, vlogs...). This drives what shows up in Up Next and
+   what Next/Previous jumps to, so songs recommend songs and long-form
+   videos recommend long-form videos. */
+const SONG_TITLE_HINTS=['official music video','official lyric video','official lyrics video','music video','lyric video','lyrics video'];
+const SONG_MAX_SECONDS=5*60+35; // 5:35
+function durToSeconds(dur){
+  if(!dur)return 0;
+  const parts=String(dur).split(':').map(Number);
+  if(parts.some(isNaN))return 0;
+  return parts.reduce((acc,p)=>acc*60+p,0);
+}
+function isSong(v){
+  if(!v)return false;
+  const t=(v.title||'').toLowerCase();
+  if(SONG_TITLE_HINTS.some(h=>t.includes(h)))return true;
+  const secs=durToSeconds(v.dur);
+  return secs>0 && secs<=SONG_MAX_SECONDS;
+}
+
+/* =====================================================================
+   PER-ACCOUNT WATCH PROGRESS + HISTORY
+   Stored in localStorage, keyed by the signed-in account's email, so
+   every account gets its own "Continue Watching", history and
+   recommendations on this device — exactly like separate YouTube
+   profiles. Shape: { [videoId]: { pos, dur, ts, done } }
+   ===================================================================== */
+function progressKey(){ return 'vf_progress_'+(currentUser?currentUser.email:'guest'); }
+function loadProgressMap(){
+  try{return JSON.parse(localStorage.getItem(progressKey()))||{};}catch(e){return {};}
+}
+function saveProgressMap(map){
+  try{localStorage.setItem(progressKey(),JSON.stringify(map));}catch(e){}
+}
+function recordProgress(id,pos,dur){
+  if(!id||!dur)return;
+  const map=loadProgressMap();
+  map[id]={pos,dur,ts:Date.now(),done:pos>=dur*0.95};
+  saveProgressMap(map);
+}
+function getProgress(id){ return loadProgressMap()[id]||null; }
+function clearWatchHistoryData(){
+  if(!confirm('Clear your watch history and continue-watching progress? This only affects your account, on this device.'))return;
+  saveProgressMap({});
+  toast('Watch history cleared.');
+  renderSidebar();
+  if(document.getElementById('home-view').style.display==='block')showHomeMode();
+}
+
+/* Continue Watching = videos with saved progress that aren't finished,
+   most-recently-watched first. */
+function continueWatchingList(pool){
+  pool=pool||videos;
+  const map=loadProgressMap();
+  return Object.keys(map)
+    .filter(id=>!map[id].done && map[id].pos>5)
+    .map(id=>pool.find(v=>v.id===id))
+    .filter(Boolean)
+    .sort((a,b)=>map[b.id].ts-map[a.id].ts);
+}
+/* Full history, most recent first (includes finished videos). Accepts an
+   optional pool so it can be scoped to a single feed (General or Kids)
+   instead of always pulling from every video regardless of feed. */
+function fullHistoryList(pool){
+  pool=pool||videos;
+  const map=loadProgressMap();
+  return Object.keys(map)
+    .map(id=>pool.find(v=>v.id===id))
+    .filter(Boolean)
+    .sort((a,b)=>map[a.id]&&map[b.id]?map[b.id].ts-map[a.id].ts:0);
+}
+
+/* A stable-per-pageload random number for a given id — same value every
+   time it's read during this session, but a fresh value on the next
+   reload. This is what lets us "surface" videos that were buried lower
+   down without the shelves jittering every few seconds while someone's
+   looking at the page. */
+function sessionRandom(id){
+  if(!(id in sessionRandomMap))sessionRandomMap[id]=Math.random();
+  return sessionRandomMap[id];
+}
+/* Fully re-shuffles a list using the per-session random values — used
+   for Songs / Long-form so older uploads get a real, random shot at the
+   front of the row each time the page is refreshed. */
+function sessionShuffled(list){
+  return list.map(v=>({v,r:sessionRandom(v.id)})).sort((a,b)=>b.r-a.r).map(x=>x.v);
+}
+/* Blends recency with the per-session random value, so "Recently Added"
+   still leans recent but regularly pulls something from further back up
+   to the top on refresh. */
+function surfaceBlend(list){
+  const byTs=[...list].sort((a,b)=>b.ts-a.ts);
+  const n=byTs.length||1;
+  return byTs
+    .map((v,i)=>({v,score:(1-i/n)*0.55+sessionRandom(v.id)*0.45}))
+    .sort((a,b)=>b.score-a.score);
+}
+
+/* Per-account "Recommended for you": weight each category by how much
+   this account has actually watched it, then rank videos (excluding
+   the account's own uploads) by that weight, breaking ties randomly
+   per-session so the row still feels alive on refresh. */
+function recommendedForAccount(basePool){
+  basePool=basePool||videos;
+  const map=loadProgressMap();
+  const watchedIds=new Set(Object.keys(map));
+  const catWeight={};
+  watchedIds.forEach(id=>{
+    const v=videos.find(x=>x.id===id);
+    if(v)catWeight[v.cat]=(catWeight[v.cat]||0)+1;
+  });
+  const pool=basePool.filter(v=>!isOwner(v));
+  if(!Object.keys(catWeight).length)return sessionShuffled(pool);
+  return pool
+    .map(v=>({v,score:(catWeight[v.cat]||0)+sessionRandom(v.id)}))
+    .sort((a,b)=>b.score-a.score)
+    .map(x=>x.v);
+}
+
+/* View counts now ONLY change in two real situations:
+   1) Someone who isn't the uploader opens/watches the video (see openVideo,
+      openVideo below).
+   2) Another browser tab on this device reports a real view via the
+      'storage' listener above.
+   There is no more background timer inflating numbers on its own. */
+
+function renderAll(){
+  document.getElementById('studio-view').style.display='none';
+  document.getElementById('home-view').style.display='block';
+  setActiveSidebar('sl-home');
+  const has=videos.length>0;
+  document.getElementById('empty-state').style.display=has?'none':'flex';
+  document.getElementById('has-content').style.display=has?'block':'none';
+  if(!has){renderSidebar();return;}
+  const cats=['All',...new Set(generalPool().map(v=>v.cat))];
+  document.getElementById('cats').innerHTML=cats.map(c=>`<div class="cat${c===catFilter?' active':''}" onclick="setCat('${c}',this)">${c}</div>`).join('');
+  showHomeMode();
+  renderSidebar();
+}
+
+/* Home defaults to Netflix-style horizontal shelves (Recently Added,
+   Songs, Long-form, plus one row per category). Picking a specific
+   category or searching switches over to a single filtered grid. */
+function showHomeMode(){
+  const wrap=document.getElementById('shelves-wrap');
+  const gridWrap=document.getElementById('grid-wrap');
+  if(catFilter==='All'){
+    gridWrap.style.display='none';
+    wrap.style.display='block';
+    renderShelves();
+  }else{
+    wrap.style.display='none';
+    gridWrap.style.display='block';
+    document.getElementById('sec-title').textContent=catFilter;
+    renderGrid();
+  }
+}
+
+function shelfHTML(title,list,resumeMode){
+  if(!list.length)return '';
+  const clickFn=resumeMode?'resumeFromSidebar':'openVideo';
+  return `
+    <div class="shelf">
+      <div class="shelf-head"><div class="shelf-title">${title}</div><div class="shelf-count">${list.length} video${list.length===1?'':'s'}</div></div>
+      <div class="shelf-row-wrap">
+        <button class="shelf-navbtn left" onclick="scrollShelf(this,-1)">&#8249;</button>
+        <div class="shelf-row">
+          ${list.map(v=>`
+            <div class="shelf-card" onclick="${clickFn}('${v.id}')">
+              <div class="shelf-thumb">
+                ${v.thumb?`<img src="${v.thumb}">`:`<canvas id="sh-${v.id}" style="width:100%;height:100%;display:block;"></canvas>`}
+                <div class="vtype-badge ${isSong(v)?'song':'movie'}">${isSong(v)?'♪':'▶'}</div>
+                ${v.feed==='kids'?'<div class="kids-badge">KIDS</div>':''}
+                <div class="vdur">${v.dur}</div>
+                ${progressBarHTML(v.id)}
+              </div>
+              <div class="shelf-info">
+                <div class="shelf-vtitle">${v.title}</div>
+                <div class="shelf-vmeta">${fmtN(v.views)} views · ${timeAgo(v.ts)}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <button class="shelf-navbtn right" onclick="scrollShelf(this,1)">&#8250;</button>
+      </div>
+    </div>`;
+}
+
+/* underneath a watched video's thumbnail: a blue line showing how far in
+   the account got, like YT's progress bar on thumbnails. */
+function progressBarHTML(id){
+  const p=getProgress(id);
+  if(!p||!p.dur)return '';
+  const pct=Math.min(100,Math.round(p.pos/p.dur*100));
+  if(pct<2)return '';
+  return `<div class="thumb-progress-track"><div class="thumb-progress-fill" style="width:${pct}%;"></div></div>`;
+}
+function scrollShelf(btn,dir){
+  const row=btn.closest('.shelf-row-wrap').querySelector('.shelf-row');
+  row.scrollBy({left:dir*(row.clientWidth*0.85),behavior:'smooth'});
+}
+
+function renderShelves(){
+  const wrap=document.getElementById('shelves-wrap');
+  // Every row on the General Home is built exclusively from the general
+  // pool — Kids-approved videos are a completely separate database from
+  // this feed's point of view and never enter any of these rankings.
+  const pool=generalPool();
+  const continuing=continueWatchingList(pool);
+  const recommended=recommendedForAccount(pool);
+  const recent=surfaceBlend(pool).map(x=>x.v);
+  const songs=sessionShuffled(pool.filter(isSong));
+  const longform=sessionShuffled(pool.filter(v=>!isSong(v)));
+  const otherCats=[...new Set(pool.map(v=>v.cat))].filter(c=>c!=='Movies'&&c!=='Music');
+  let html='';
+  if(continuing.length)html+=shelfHTML('Continue Watching',continuing,true);
+  if(currentUser)html+=shelfHTML('Recommended for '+currentUser.name,recommended.slice(0,20));
+  html+=shelfHTML('Recently Added',recent)+shelfHTML('Songs',songs)+shelfHTML('Movies & Long-form',longform);
+  otherCats.forEach(c=>{ html+=shelfHTML(c,pool.filter(v=>v.cat===c)); });
+  wrap.innerHTML=html;
+  pool.forEach(v=>{ if(!v.thumb){const c=document.getElementById('sh-'+v.id); if(c)drawCanvas('sh-'+v.id,v); }});
+}
+
+function setActiveSidebar(id){
+  document.querySelectorAll('.s-link').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+}
+
+function renderGrid(list,resumeMode){
+  list=list||generalPool().filter(v=>catFilter==='All'||v.cat===catFilter);
+  const clickFn=resumeMode?'resumeFromSidebar':'openVideo';
+  const g=document.getElementById('vgrid');
+  g.innerHTML=list.length
+    ?list.map(v=>`
+      <div class="vcard" onclick="${clickFn}('${v.id}')">
+        <div class="vthumb">
+          ${v.thumb?`<img src="${v.thumb}" style="width:100%;height:100%;object-fit:cover;display:block;">`:`<canvas id="c-${v.id}" style="width:100%;height:100%;display:block;"></canvas>`}
+          <div class="vtype-badge ${isSong(v)?'song':'movie'}">${isSong(v)?'♪ SONG':'MOVIE/LONG'}</div>
+          ${v.feed==='kids'?'<div class="kids-badge">KIDS</div>':''}
+          <div class="vdur">${v.dur}</div>
+          ${progressBarHTML(v.id)}
+        </div>
+        <div class="vinfo">
+          <div class="vrow">
+            <div class="vch-av">${initials(v.title)}</div>
+            <div>
+              <div class="vtitle">${v.title}</div>
+              <div class="vch">${v.cat} · <span class="badge-q">${maxQualityLabel(v)}</span></div>
+              <div class="vstats">${fmtN(v.views)} views · ${timeAgo(v.ts)}</div>
+            </div>
+          </div>
+        </div>
+      </div>`).join('')
+    :`<div style="color:var(--text3);padding:40px 0;grid-column:1/-1;font-size:14px;">No videos found.</div>`;
+  list.forEach(v=>{if(!v.thumb)drawCanvas('c-'+v.id,v);});
+}
+
+function maxQualityLabel(v){return (v.quality==='high'?'1080P':'480P');}
+
+function drawCanvas(id,v){
+  const c=document.getElementById(id);
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=320;c.height=180;
+  ctx.fillStyle='#0e0e2a';
+  ctx.fillRect(0,0,320,180);
+  ctx.fillStyle='#00b4ff22';
+  ctx.fillRect(0,0,320,180);
+  ctx.fillStyle='#00b4ff';
+  ctx.font='bold 52px sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('▶',160,90);
+  if(v.url){
+    const tmp=document.createElement('video');
+    tmp.crossOrigin='anonymous';
+    tmp.src=v.url;tmp.muted=true;tmp.preload='metadata';
+    tmp.addEventListener('loadedmetadata',function(){
+      // Grab a frame a little way into the video (not frame 0, which is
+      // often a black/logo frame), scaling with length but capped so we
+      // don't wait forever seeking into a 2-hour movie.
+      this.currentTime=Math.min(Math.max(2,this.duration*0.02),15);
+    });
+    tmp.addEventListener('seeked',function(){
+      try{ctx.drawImage(this,0,0,320,180);v.thumb=c.toDataURL('image/jpeg',0.75);saveVideosMeta(v);}catch(e){}
+    });
+  }
+}
+
+function renderSidebar(){
+  document.querySelectorAll('.hist-btn').forEach(el=>el.classList.remove('active'));
+  const modeBtn={recent:null,history:'hb-history',liked:'hb-liked',subs:'hb-subs'}[sidebarMode];
+  if(modeBtn){const b=document.getElementById(modeBtn);if(b)b.classList.add('active');}
+
+  const head=document.getElementById('sh-recent');
+  let list;
+  if(sidebarMode==='history'){ if(head)head.textContent='Watch History'; list=fullHistoryList(generalPool()); }
+  else if(sidebarMode==='liked'){ if(head)head.textContent='Liked Videos'; list=generalPool().filter(v=>liked.has(v.id)); }
+  else if(sidebarMode==='subs'){ if(head)head.textContent='Subscribed Channels'; list=generalPool().filter(v=>subbed.has(v.uploaderEmail)); }
+  else { if(head)head.textContent='Recently Watched'; list=fullHistoryList(generalPool()).slice(0,10); }
+
+  const el=document.getElementById('sidebar-list');
+  if(!list.length){
+    el.innerHTML=`<div class="s-empty">${sidebarMode==='recent'?'Nothing watched yet.':sidebarMode==='liked'?'No liked videos yet.':sidebarMode==='subs'?'No subscriptions yet.':'No history yet.'}<br>Watch something to see it here!</div>`;
+    return;
+  }
+  el.innerHTML=list.map(v=>{
+    const p=getProgress(v.id);
+    const resumeAttr=p&&!p.done?` data-resume="${p.pos}"`:'';
+    return `
+    <div class="hist-mini" onclick="resumeFromSidebar('${v.id}')"${resumeAttr}>
+      <div class="hist-mini-thumb">
+        ${v.thumb?`<img src="${v.thumb}">`:`<canvas id="sc-${v.id}" style="width:100%;height:100%;display:block;"></canvas>`}
+        ${progressBarHTML(v.id)}
+      </div>
+      <div class="hist-mini-title">${v.title}</div>
+    </div>`;
+  }).join('');
+  list.forEach(v=>{
+    if(v.thumb)return;
+    const c=document.getElementById('sc-'+v.id);
+    if(!c)return;
+    const ctx=c.getContext('2d');c.width=60;c.height=34;
+    ctx.fillStyle='#0e0e2a';ctx.fillRect(0,0,60,34);
+    ctx.fillStyle='#00b4ff';ctx.font='bold 14px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('▶',30,17);
+  });
+}
+
+function resumeFromSidebar(id){
+  const p=getProgress(id);
+  if(p&&!p.done&&p.pos>5)openVideo(id,{resumeAt:p.pos});
+  else openVideo(id);
+}
+
+/* Sidebar "You" quick-action buttons */
+function openContinueWatching(){
+  setKidsMode(false);
+  goHomeQuiet();
+  catFilter='All';
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  const cw=continueWatchingList(generalPool());
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent='Continue Watching';
+  renderGrid(cw,true);
+  setActiveSidebar('');
+}
+function openHistoryView(){ setKidsMode(false); sidebarMode='history'; renderSidebar(); toast('Showing watch history in the sidebar.'); }
+function openLikedView(){
+  setKidsMode(false);
+  sidebarMode='liked'; renderSidebar();
+  goHomeQuiet();
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent='Liked Videos';
+  renderGrid(generalPool().filter(v=>liked.has(v.id)));
+  setActiveSidebar('');
+}
+function openSubsView(){
+  setKidsMode(false);
+  sidebarMode='subs'; renderSidebar();
+  goHomeQuiet();
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent='From Channels You Follow';
+  renderGrid(generalPool().filter(v=>subbed.has(v.uploaderEmail)));
+  setActiveSidebar('');
+}
+/* ===== KIDS FEED =====
+   Only videos the AI classifier (see server-side classifyKids) actually
+   approved show up here — a manual "Kids" selection alone isn't enough. */
+function openKidsFeed(){
+  setKidsMode(true);
+  goHomeQuiet();
+  catFilter='All';
+  sidebarMode='recent';
+  setActiveSidebar('sl-kids-home');
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent='Kids Feed — AI-verified for children';
+  renderGrid(kidsPool());
+}
+/* ===== FOR YOU FEED ===== */
+async function openForYouFeed(){
+  if(!currentUser){ toast('Sign in to see your For You feed.'); return; }
+  setKidsMode(false);
+  goHomeQuiet();
+  catFilter='All';
+  sidebarMode='recent';
+  setActiveSidebar('sl-foryou');
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent='For You ✨';
+  document.getElementById('vgrid').innerHTML='<div style="color:var(--text3);padding:40px 0;grid-column:1/-1;font-size:14px;">Loading recommendations…</div>';
+  const recs=await apiFetchRecommendations(40);
+  if(!recs.length){
+    document.getElementById('vgrid').innerHTML='<div style="color:var(--text3);padding:40px 0;grid-column:1/-1;font-size:14px;">Watch and like some videos to get personalised recommendations!</div>';
+    return;
+  }
+  renderGrid(recs);
+}
+
+/* Like goHome() but doesn't touch the mini/PiP player, used when jumping
+   between home-side views from the sidebar buttons. */
+function goHomeQuiet(){
+  document.getElementById('pv').classList.remove('on');
+  document.getElementById('studio-view').style.display='none';
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('wrap').classList.remove('watching');
+}
+
+/* ===== WATCH PAGE ===== */
+function openVideo(id,opts){
+  opts=opts||{};
+  closeMiniPlayer(true);
+  const v=videos.find(x=>x.id===id);
+  if(!v)return;
+
+  // push previous video onto history (for the Previous button) unless we're navigating via prev/next
+  if(!opts.fromNav && currentId && currentId!==id)watchHistory.push(currentId);
+  currentId=id;
+
+  // View-count rule: counts ACCOUNTS, not plays. The uploader watching
+  // their own upload never counts, and the same account watching again
+  // never adds a second view — the server (viewedBy list) is the source
+  // of truth and dedupes by account email.
+  if(!isOwner(v) && currentUser){
+    apiTrackWatch(id,0,false); // record the view event immediately in activity
+    apiRegisterView(id,currentUser.email).then(updated=>{
+      if(!updated)return;
+      v.views=updated.views;
+      v.viewedBy=updated.viewedBy;
+      if(currentId===id)document.getElementById('pv-stats').textContent=fmtN(v.views)+' views · '+timeAgo(v.ts);
+    });
+  }
+
+  document.getElementById('studio-view').style.display='none';
+  document.getElementById('home-view').style.display='none';
+  const pv=document.getElementById('pv');
+  pv.classList.add('on');
+  document.getElementById('wrap').classList.add('watching'); // bigger player: sidebar collapses away
+  setActiveSidebar('');
+
+  document.getElementById('pv-title').textContent=v.title;
+  (function(){
+  const avEl=document.getElementById('pv-av');
+  avEl.textContent=initials(v.uploaderName||v.title);
+  avEl.style.backgroundImage='';
+  avEl.style.backgroundSize='';
+  fetch('/api/profile/'+encodeURIComponent(v.uploaderEmail))
+    .then(r=>r.ok?r.json():null)
+    .then(p=>{
+      if(p&&p.avatar&&currentId===id){
+        avEl.textContent='';
+        avEl.style.backgroundImage='url('+p.avatar+')';
+        avEl.style.backgroundSize='cover';
+        avEl.style.backgroundPosition='center';
+        avEl.style.backgroundRepeat='no-repeat';
+      }
+    }).catch(()=>{});
+})();
+  document.getElementById('pv-cn').textContent=v.uploaderName||'Creator';
+  document.getElementById('pv-sub-count').textContent=(channelSubCache[v.uploaderEmail]!=null?fmtN(channelSubCache[v.uploaderEmail]):'…')+' flows';
+  // Real per-account subscriber count, fetched from the server (see
+  // /api/subscribers/:ownerEmail) — never a made-up baseline number.
+  apiGetSubscribers(v.uploaderEmail).then(res=>{
+    channelSubCache[v.uploaderEmail]=res.count;
+    if(currentId===id)document.getElementById('pv-sub-count').textContent=fmtN(res.count)+' Flow'+(res.count===1?'':'s')
+  });
+  document.getElementById('pv-stats').textContent=fmtN(v.views)+' views · '+timeAgo(v.ts);
+  const metaBits=[];
+  if(v.audience)metaBits.push('Audience: '+(v.audience==='kids'?'Kids':'General'));
+  if(v.feed==='kids')metaBits.push('✅ AI-verified for Kids');
+  document.getElementById('pv-desc').textContent=(v.desc?v.desc+'\n\n':'')+(metaBits.length?metaBits.join('  ·  '):(v.desc?'':'No description.'));
+  document.getElementById('lc').textContent=fmtN(v.likes);
+  document.getElementById('btn-like').className='act'+(liked.has(id)?' liked':'');
+  document.getElementById('ap-state').textContent=autoplayOn?'ON':'OFF';
+  document.getElementById('btn-autoplay').className='act'+(autoplayOn?' on':'');
+
+  const sb=document.getElementById('btn-sub');
+  sb.style.display=isOwner(v)?'none':'inline-block';
+  sb.textContent=subbed.has(v.uploaderEmail)?'Following':'Flow';
+  sb.className='btn-sub'+(subbed.has(v.uploaderEmail)?' subbed':'');
+
+  // Reset custom player UI for the new video
+  const box=document.getElementById('video-box');
+  if(box){box.classList.add('paused');box.classList.remove('controls-hidden');}
+  document.getElementById('vf-progress').style.width='0%';
+  document.getElementById('vf-buffered').style.width='0%';
+  document.getElementById('vf-thumb').style.left='0%';
+  document.getElementById('vf-time').textContent='0:00 / 0:00';
+  document.getElementById('vf-play-btn').innerHTML='&#9654;';
+  // Reset speed to match current setting
+  const vid=document.getElementById('main-vid');
+  vid.onended=null;
+  vid.ontimeupdate=null;
+  vid.pause();
+  vid.removeAttribute('src');
+  vid.load();
+  vid.muted=false;
+  vid.playbackRate=vfCurrentSpeed;
+  vid.src=v.url;
+  vid.load();
+  // Resume rule: an EXPLICIT resumeAt (only passed from History / Continue
+  // Watching, via resumeFromSidebar) always honors the saved position.
+  // Without that, songs never silently resume — reached via Up Next, a
+  // shelf, search, etc. they always start from 0:00. Long-form video
+  // (movies/episodes) keeps auto-resuming like before.
+  const savedProgress=getProgress(id);
+  let resumeAt=null;
+  if(opts.resumeAt!=null){
+    resumeAt=opts.resumeAt;
+  }else if(!isSong(v) && savedProgress && !savedProgress.done && savedProgress.pos>5){
+    resumeAt=savedProgress.pos;
+  }
+  if(resumeAt)vid.addEventListener('loadedmetadata',function once(){vid.currentTime=resumeAt;vid.removeEventListener('loadedmetadata',once);});
+  const playPromise=vid.play();
+  if(playPromise!==undefined){playPromise.catch(()=>{});}
+  vid.onended=function(){
+    recordProgress(id,vid.duration||0,vid.duration||0);
+    // Flush remaining watch time + mark completed
+    apiTrackWatch(id,Math.round(sessionWatchSeconds),true);
+    sessionWatchSeconds=0;
+    if(!autoplayOn)return;
+    playNext();
+  };
+  let lastProgressSave=0;
+  let lastActivityFlush=0;
+  let sessionWatchSeconds=0;
+  vid.ontimeupdate=function(){
+    if(!vid.duration)return;
+    const now=Date.now();
+    if(now-lastProgressSave<4000)return;
+    const elapsed=(now-lastProgressSave)/1000;
+    lastProgressSave=now;
+    recordProgress(id,vid.currentTime,vid.duration);
+    // Accumulate watch seconds for this session
+    sessionWatchSeconds+=Math.min(elapsed,5); // cap at 5s per tick to avoid drift
+    // Flush activity to server every ~20 s
+    if(now-lastActivityFlush>20000){
+      lastActivityFlush=now;
+      apiTrackWatch(id,Math.round(sessionWatchSeconds),false);
+      sessionWatchSeconds=0;
+    }
+    // Keep this feed's queue topped up well before the video ends, so
+    // autoplay always has a full batch ready and never has to pause.
+    if(vid.duration-vid.currentTime<30)topUpQueue(v);
+  };
+
+  buildQualityMenu(v);
+  renderComments(v);
+
+  // A manually-picked video (not reached via Next/autoplay) starts a
+  // fresh queue for its feed, ranked off THIS video — so "Up Next"
+  // always reflects what you're actually watching now, not leftovers
+  // from whatever was playing before. Videos reached via Next/Previous
+  // keep extending the existing queue instead of resetting it.
+  if(!opts.fromNav)setQueueFor(feedOf(v),[]);
+  topUpQueue(v);
+  const feed=feedOf(v);
+  document.getElementById('un-title').textContent=(feed==='kids'?'Up Next · Kids Mix':'Up Next · Your Mix');
+  const others=queueFor(feed).filter(x=>x.id!==id);
+  document.getElementById('up-next').innerHTML=others.length
+    ?others.map(x=>`
+      <div class="un-card" onclick="openVideo('${x.id}')">
+        <div class="un-thumb">
+          ${x.thumb?`<img src="${x.thumb}">`:`<canvas id="uc-${x.id}" style="width:100%;height:100%;display:block;"></canvas>`}
+          <div class="un-dur">${x.dur}</div>
+          ${progressBarHTML(x.id)}
+        </div>
+        <div class="un-info">
+          <div class="un-t">${x.title}</div>
+          <div class="un-c">${x.cat} · ${fmtN(x.views)} views</div>
+        </div>
+      </div>`).join('')
+    :`<div style="color:var(--text3);font-size:13px;padding:8px;">${isSong(v)?'Upload more songs':'Upload more videos'} to see suggestions here.</div>`;
+  others.forEach(x=>{if(!x.thumb){const c=document.getElementById('uc-'+x.id);if(!c)return;const ctx=c.getContext('2d');c.width=120;c.height=68;ctx.fillStyle='#0e0e2a';ctx.fillRect(0,0,120,68);ctx.fillStyle='#00b4ff';ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('▶',60,34);}});
+  document.getElementById('main').scrollTop=0;
+}
+
+/* =====================================================================
+   SMART MIX — a deterministic, content-based "what to play next" ranker.
+   It scores every other video against the one currently playing using
+   metadata we actually have: category match, title-keyword overlap,
+   same creator, similar duration, engagement (like ratio, popularity),
+   recency, and how much this account has historically watched that
+   category. There is NO randomness in the ordering — the same inputs
+   always produce the same ranking, which is what makes Next/Previous
+   and autoplay predictable instead of feeling like a random shuffle.
+   ===================================================================== */
+function tokenizeTitle(t){
+  return (t||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>2);
+}
+function titleOverlapScore(a,b){
+  const ta=new Set(tokenizeTitle(a.title));
+  const tb=tokenizeTitle(b.title);
+  if(!ta.size||!tb.length)return 0;
+  let hits=0;
+  tb.forEach(w=>{if(ta.has(w))hits++;});
+  return hits/Math.max(ta.size,tb.length);
+}
+function smartMixScore(v,curr,catWeight,watchedIds){
+  let score=0;
+  if(v.cat===curr.cat)score+=3;
+  score+=titleOverlapScore(curr,v)*3;
+  if(v.uploaderEmail && v.uploaderEmail===curr.uploaderEmail)score+=2;
+  const durDelta=Math.abs(durToSeconds(v.dur)-durToSeconds(curr.dur));
+  score+=Math.max(0,1-durDelta/600);
+  score+=Math.min(1,(v.likes||0)/Math.max(1,v.views||1))*1.2; // like ratio
+  score+=Math.min(1,Math.log10((v.views||0)+1)/6); // popularity, log-scaled so it doesn't dominate
+  const daysOld=(Date.now()-v.ts)/86400000;
+  score+=Math.max(0,1-daysOld/30)*0.5; // slight recency nudge
+  if(catWeight[v.cat])score+=Math.min(1,catWeight[v.cat]/5); // this account watches this category a lot
+  if(watchedIds.has(v.id))score-=2; // de-prioritize (not exclude) already-watched
+  return score;
+}
+function buildSmartMix(curr,excludeId){
+  const wantSong=isSong(curr);
+  const wantFeed=feedOf(curr);
+  // feedOf(v)===wantFeed is the actual separation boundary: a Kids video
+  // is only ever ranked against other Kids videos, and General only ever
+  // against General — this one filter is what keeps every "Up Next" panel,
+  // Next button, and autoplay queue below from ever mixing the two feeds.
+  const pool=videos.filter(v=>v.id!==excludeId && isSong(v)===wantSong && feedOf(v)===wantFeed);
+  const progressMap=loadProgressMap();
+  const watchedIds=new Set(Object.keys(progressMap));
+  const catWeight={};
+  watchedIds.forEach(id=>{const vv=videos.find(x=>x.id===id);if(vv)catWeight[vv.cat]=(catWeight[vv.cat]||0)+1;});
+  return pool
+    .map(v=>({v,score:smartMixScore(v,curr,catWeight,watchedIds)}))
+    .sort((a,b)=>b.score-a.score || b.v.ts-a.v.ts)
+    .map(x=>x.v);
+}
+
+/* =====================================================================
+   PER-FEED AUTOPLAY QUEUES
+   Kids and General each keep their own queue array + "already surfaced"
+   set, so building one queue can never touch the other. A queue is kept
+   topped up to QUEUE_TARGET (see const above) using the same feed-aware
+   Smart Mix ranking, chained off its own tail so the queue keeps making
+   sense video-to-video instead of jumping back to always rank off the
+   very first seed. When the whole pool of that feed/type has been
+   surfaced once, the "played" set is cleared so the queue can keep
+   recycling the library — this is what makes Kids autoplay genuinely
+   never stop instead of running out after a couple of videos.
+   ===================================================================== */
+function queueFor(feed){ return feed==='kids'?kidsQueue:generalQueue; }
+function setQueueFor(feed,q){ if(feed==='kids')kidsQueue=q; else generalQueue=q; }
+function playedSetFor(feed){ return feed==='kids'?kidsQueuePlayed:generalQueuePlayed; }
+
+function topUpQueue(seed){
+  if(!seed)return;
+  const feed=feedOf(seed);
+  const wantSong=isSong(seed);
+  const typePool=videos.filter(v=>feedOf(v)===feed && isSong(v)===wantSong);
+  if(typePool.length<2)return; // nothing else in this feed/type to queue up
+  let queue=queueFor(feed);
+  const played=playedSetFor(feed);
+  let guard=0;
+  while(queue.length<QUEUE_TARGET && guard<200){
+    guard++;
+    const tail=queue.length?queue[queue.length-1]:seed;
+    const exclude=new Set([seed.id,...queue.map(v=>v.id),...played]);
+    let mix=buildSmartMix(tail,tail.id).filter(v=>!exclude.has(v.id));
+    if(!mix.length){
+      // Whole feed/type pool has been surfaced already this session —
+      // recycle it (clear the played history) rather than ever stopping.
+      played.clear();
+      const exclude2=new Set([seed.id,...queue.map(v=>v.id)]);
+      mix=buildSmartMix(tail,tail.id).filter(v=>!exclude2.has(v.id));
+      if(!mix.length)break; // only one video total in this feed/type — nothing left to add
+    }
+    queue.push(mix[0]);
+  }
+  setQueueFor(feed,queue);
+}
+
+function playNext(){
+  const curr=videos.find(x=>x.id===currentId);
+  if(!curr)return;
+  const feed=feedOf(curr);
+  // Drop anything stale (deleted, or somehow drifted feed/type) before using it.
+  let queue=queueFor(feed).filter(v=>videos.some(x=>x.id===v.id) && feedOf(v)===feed && isSong(v)===isSong(curr));
+  let next=queue.shift();
+  setQueueFor(feed,queue);
+  if(!next){
+    topUpQueue(curr);
+    queue=queueFor(feed);
+    next=queue.shift();
+    setQueueFor(feed,queue);
+  }
+  if(!next){
+    toast('No more '+(isSong(curr)?'songs':'videos')+' to suggest yet in the '+(feed==='kids'?'Kids':'General')+' Feed.');
+    return;
+  }
+  playedSetFor(feed).add(next.id);
+  openVideo(next.id,{fromNav:true});
+}
+function playPrev(){
+  const curr=videos.find(x=>x.id===currentId);
+  const wantSong=curr?isSong(curr):false;
+  const wantFeed=curr?feedOf(curr):'general';
+  while(watchHistory.length){
+    const prevId=watchHistory.pop();
+    const prevV=videos.find(x=>x.id===prevId);
+    if(!prevV)continue; // was deleted meanwhile
+    if(isSong(prevV)!==wantSong)continue; // stay within songs vs long-form
+    if(feedOf(prevV)!==wantFeed)continue; // never cross Kids/General feeds
+    openVideo(prevId,{fromNav:true});
+    return;
+  }
+  toast('No earlier '+(wantSong?'song':'video')+' in this session.');
+}
+
+/* ===== QUALITY SWITCHER (uses processed qualities map from server) ===== */
+function availableQualities(v){
+  // Primary path: server always sends v.qualities with only the generated files
+  if(v.qualities && Object.keys(v.qualities).length){
+    return Object.keys(v.qualities)
+      .map(k=>parseInt(k))
+      .filter(Boolean)
+      .sort((a,b)=>a-b);
+  }
+  // Fallback: derive cap from originalHeight (new field) or originalQuality,
+  // never going above what the source could provide.
+  const capHeight = v.originalHeight
+    ? v.originalHeight
+    : (v.originalQuality ? parseInt(v.originalQuality) : 480);
+  return QUALITY_LADDER.filter(q => q <= capHeight);
+}
+function qualityUrl(v,q){
+  if(v.qualities){
+    const key=q+'p';
+    if(v.qualities[key])return v.qualities[key];
+  }
+  if(v.url)return v.url;
+  return `/processed/${v.id}/${q}p.mp4`;
+}
+// Legacy stub — menu is now in the settings panel; kept so any old callers don't crash
+function buildQualityMenu(v){
+  vfBuildSettingsMenu(v);
+}
+function toggleQualityMenu(){}
+
+function pickQuality(q){
+  const v=videos.find(x=>x.id===currentId);
+  if(!v)return;
+  const opts=availableQualities(v);
+  const resolved=(q==='auto')?opts[opts.length-1]:q;
+  v.activeQuality=resolved;
+
+  // Rebuild settings menu to show new checkmark
+  vfBuildSettingsMenu(v);
+
+  const vid=document.getElementById('main-vid');
+  const newSrc=qualityUrl(v,resolved);
+  if(vid.src.split('?')[0]!==new URL(newSrc,location.href).href.split('?')[0]){
+    const t=vid.currentTime;
+    const wasPaused=vid.paused;
+    vid.src=newSrc;
+    vid.load();
+    vid.addEventListener('loadedmetadata',function once(){
+      vid.currentTime=t;
+      vid.removeEventListener('loadedmetadata',once);
+      if(!wasPaused){const p=vid.play();if(p!==undefined)p.catch(()=>{});}
+    });
+  }
+  toast('Playing at '+(q==='auto'?'Auto ('+resolved+'p)':q+'p'));
+}
+
+/* ===== CUSTOM PLAYER — VidFlow Premium Controls ===== */
+let vfHideTimer=null;
+let vfCurrentSpeed=1;
+const VF_SPEEDS=[0.5,0.75,1,1.25,1.5,2];
+
+function vfInit(){
+  const vid=document.getElementById('main-vid');
+  const box=document.getElementById('video-box');
+  const timeline=document.getElementById('vf-timeline');
+
+  // Progress / buffering update
+  vid.addEventListener('timeupdate',vfUpdateTimeline);
+  vid.addEventListener('progress',vfUpdateTimeline);
+  vid.addEventListener('loadedmetadata',vfUpdateTimeline);
+  vid.addEventListener('durationchange',vfUpdateTimeline);
+
+  // Play / pause state
+  vid.addEventListener('play',()=>{
+    document.getElementById('vf-play-btn').innerHTML='&#9646;&#9646;'; // pause icon
+    box.classList.remove('paused');
+    vfResetHideTimer();
+  });
+  vid.addEventListener('pause',()=>{
+    document.getElementById('vf-play-btn').innerHTML='&#9654;'; // play icon
+    box.classList.add('paused');
+    clearTimeout(vfHideTimer);
+    box.classList.remove('controls-hidden');
+  });
+  vid.addEventListener('ended',()=>{
+    box.classList.add('paused');
+    box.classList.remove('controls-hidden');
+  });
+
+  // Fullscreen change
+  document.addEventListener('fullscreenchange',vfOnFullscreenChange);
+  document.addEventListener('webkitfullscreenchange',vfOnFullscreenChange);
+
+  // Mouse activity — show/hide controls
+  box.addEventListener('mousemove',vfShowControls);
+  box.addEventListener('mouseleave',()=>{ if(!vid.paused) vfResetHideTimer(); });
+
+  // Touch support
+  box.addEventListener('touchstart',vfShowControls,{passive:true});
+
+  // Click outside settings to close
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#vf-settings-wrap')){
+      const m=document.getElementById('vf-settings-menu');
+      if(m)m.classList.remove('open');
+    }
+  });
+
+  // Timeline seek — mouse
+  vfInitTimeline();
+}
+
+function vfShowControls(){
+  const box=document.getElementById('video-box');
+  box.classList.remove('controls-hidden');
+  vfResetHideTimer();
+}
+
+function vfResetHideTimer(){
+  clearTimeout(vfHideTimer);
+  const vid=document.getElementById('main-vid');
+  if(!vid.paused){
+    vfHideTimer=setTimeout(()=>{
+      document.getElementById('video-box').classList.add('controls-hidden');
+    },3000);
+  }
+}
+
+function vfUpdateTimeline(){
+  const vid=document.getElementById('main-vid');
+  const dur=vid.duration;
+  const cur=vid.currentTime;
+  if(!isFinite(dur)||!dur)return;
+
+  const pct=(cur/dur)*100;
+  document.getElementById('vf-progress').style.width=pct+'%';
+  document.getElementById('vf-thumb').style.left=pct+'%';
+
+  // Buffered
+  if(vid.buffered.length){
+    const bEnd=vid.buffered.end(vid.buffered.length-1);
+    document.getElementById('vf-buffered').style.width=((bEnd/dur)*100)+'%';
+  }
+
+  document.getElementById('vf-time').textContent=fmtDur(cur)+' / '+fmtDur(dur);
+}
+
+function vfInitTimeline(){
+  const timeline=document.getElementById('vf-timeline');
+  let dragging=false;
+
+  function seekTo(e){
+    const vid=document.getElementById('main-vid');
+    if(!vid.duration)return;
+    const rect=document.getElementById('vf-track').getBoundingClientRect();
+    const x=('touches' in e)?e.touches[0].clientX:e.clientX;
+    const pct=Math.max(0,Math.min(1,(x-rect.left)/rect.width));
+    vid.currentTime=pct*vid.duration;
+    vfUpdateTimeline();
+  }
+
+  timeline.addEventListener('mousedown',function(e){
+    dragging=true;
+    timeline.classList.add('dragging');
+    seekTo(e);
+    vfShowControls();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(dragging){seekTo(e);vfShowControls();}
+  });
+  document.addEventListener('mouseup',function(){
+    if(dragging){dragging=false;timeline.classList.remove('dragging');}
+  });
+
+  // Touch
+  timeline.addEventListener('touchstart',function(e){
+    dragging=true;timeline.classList.add('dragging');seekTo(e);
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(dragging)seekTo(e);
+  },{passive:true});
+  document.addEventListener('touchend',function(){
+    if(dragging){dragging=false;timeline.classList.remove('dragging');}
+  });
+}
+
+function vfTogglePlay(){
+  const vid=document.getElementById('main-vid');
+  if(vid.paused){vid.play().catch(()=>{});}
+  else{vid.pause();}
+}
+
+function vfToggleMute(){
+  const vid=document.getElementById('main-vid');
+  vid.muted=!vid.muted;
+  document.getElementById('vf-mute-btn').innerHTML=vid.muted?'&#128263;':'&#128266;';
+  document.getElementById('vf-vol').value=vid.muted?0:vid.volume;
+  vfUpdateVolSlider(vid.muted?0:vid.volume);
+}
+
+function vfSetVolume(val){
+  const vid=document.getElementById('main-vid');
+  vid.volume=parseFloat(val);
+  vid.muted=(val==0);
+  document.getElementById('vf-mute-btn').innerHTML=(val==0)?'&#128263;':'&#128266;';
+  vfUpdateVolSlider(val);
+}
+
+function vfUpdateVolSlider(val){
+  const sl=document.getElementById('vf-vol');
+  if(sl)sl.style.setProperty('--vol',(val*100)+'%');
+}
+
+function vfToggleFullscreen(){
+  const box=document.getElementById('video-box');
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+  }else{
+    (box.requestFullscreen||box.webkitRequestFullscreen).call(box);
+  }
+}
+
+function vfOnFullscreenChange(){
+  const btn=document.getElementById('vf-fs-btn');
+  if(!btn)return;
+  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  btn.innerHTML=inFs?'&#x2716;':'&#x26F6;';
+}
+
+function vfToggleSettings(e){
+  e.stopPropagation();
+  document.getElementById('vf-settings-menu').classList.toggle('open');
+  vfResetHideTimer();
+}
+
+function vfBuildSettingsMenu(v){
+  const opts=availableQualities(v);
+  const current=v.activeQuality||opts[opts.length-1];
+  v.activeQuality=current;
+
+  // Quality list
+  const qList=document.getElementById('vf-quality-list');
+  if(qList){
+    qList.innerHTML=[
+      `<div class="vf-settings-item${current==='auto'?' active':''}" onclick="pickQuality('auto');document.getElementById('vf-settings-menu').classList.remove('open');">
+        <span>Auto</span>${current==='auto'?'<span class="check">✓</span>':''}
+      </div>`
+    ].concat(opts.slice().reverse().map(q=>`
+      <div class="vf-settings-item${current===q?' active':''}" onclick="pickQuality(${q});document.getElementById('vf-settings-menu').classList.remove('open');">
+        <span>${q}p${q===opts[opts.length-1]?' · HD':''}</span>${current===q?'<span class="check">✓</span>':''}
+      </div>`
+    )).join('');
+  }
+
+  // Speed list
+  const sList=document.getElementById('vf-speed-list');
+  if(sList){
+    sList.innerHTML=VF_SPEEDS.map(s=>`
+      <div class="vf-settings-item${vfCurrentSpeed===s?' active':''}" onclick="vfSetSpeed(${s});document.getElementById('vf-settings-menu').classList.remove('open');">
+        <span>${s}x${s===1?' (Normal)':''}</span>${vfCurrentSpeed===s?'<span class="check">✓</span>':''}
+      </div>`
+    ).join('');
+  }
+}
+
+function vfSetSpeed(s){
+  vfCurrentSpeed=s;
+  const vid=document.getElementById('main-vid');
+  vid.playbackRate=s;
+  toast('Speed: '+s+'x');
+  const v=videos.find(x=>x.id===currentId);
+  if(v)vfBuildSettingsMenu(v);
+}
+
+// Initialize player controls on page load
+vfInit();
+
+function toggleAutoplay(){
+  autoplayOn=!autoplayOn;
+  document.getElementById('ap-state').textContent=autoplayOn?'ON':'OFF';
+  document.getElementById('btn-autoplay').className='act'+(autoplayOn?' on':'');
+  toast('Autoplay '+(autoplayOn?'enabled':'disabled'));
+}
+
+function renderComments(v){
+  const list=v.comments||[];
+  document.getElementById('cmts-head').textContent=`Comments (${list.length})`;
+  document.getElementById('cmts-list').innerHTML=list.length
+    ?list.map(c=>`<div class="cmt">
+        <div class="user-av" style="width:30px;height:30px;font-size:11px;">${c.av||'U'}</div>
+        <div class="cmt-body">
+          <span class="cmt-author">${c.author}</span><span class="cmt-time">${c.time}</span>
+          <div class="cmt-text">${c.text}</div>
+          <div><button class="cmt-act">&#128077; ${c.likes}</button><button class="cmt-act">Reply</button></div>
+        </div>
+      </div>`).join('')
+    :`<div style="color:var(--text3);font-size:13px;padding:6px 0;">No comments yet — Be The First!</div>`;
+}
+
+function postComment(){
+  if(guestBlock('Commenting')) return;
+  const v=videos.find(x=>x.id===currentId);
+  const inp=document.getElementById('cmt-inp');
+  if(!v||!inp.value.trim())return;
+  if(!v.comments)v.comments=[];
+  v.comments.unshift({author:currentUser?currentUser.name:'You',av:currentUser?currentUser.initials:'U',time:'NEW',text:inp.value.trim(),likes:0});
+  inp.value='';
+  renderComments(v);
+  saveVideosMeta(v);
+  toast('Comment posted!');
+}
+
+function toggleLike(){
+  if(guestBlock('Liking videos')) return;
+  const v=videos.find(x=>x.id===currentId);if(!v)return;
+  if(liked.has(currentId)){liked.delete(currentId);v.likes--;}
+  else{liked.add(currentId);v.likes++;}
+  document.getElementById('lc').textContent=fmtN(v.likes);
+  document.getElementById('btn-like').className='act'+(liked.has(currentId)?' liked':'');
+  saveVideosMeta(v);
+  apiTrackLike(currentId,liked.has(currentId));
+}
+
+async function toggleSub(){
+  const v=videos.find(x=>x.id===currentId);if(!v||!currentUser)return;
+  const owner=v.uploaderEmail;
+  const sb=document.getElementById('btn-sub');
+
+  if(subbed.has(owner)){
+    subbed.delete(owner);
+    sb.textContent='Flow';
+    sb.className='btn-sub';
+
+    const res=await apiUnsubscribe(currentUser.email,owner);
+    if(res)channelSubCache[owner]=res.count;
+
+    apiTrackFollow(owner,false);
+
+    document.getElementById('pv-sub-count').textContent=
+      fmtN(channelSubCache[owner]||0)+' Flows';
+
+    toast('Removed Flow.');
+  }else{
+    subbed.add(owner);
+    sb.textContent='Following';
+    sb.className='btn-sub subbed';
+
+    const res=await apiSubscribe(currentUser.email,owner);
+    if(res)channelSubCache[owner]=res.count;
+
+    apiTrackFollow(owner,true);
+
+    document.getElementById('pv-sub-count').textContent=
+      fmtN(channelSubCache[owner]||0)+' Flow'+(channelSubCache[owner]===1?'':'s');
+
+    toast('Now Following!');
+  }
+}
+
+function reportVideo(){
+  const v=videos.find(x=>x.id===currentId);
+  if(!v||!currentUser)return;
+  if(isOwner(v)){toast("You can't report your own video.");return;}
+  apiReport(v.id,currentUser.email,'Audience/category looks wrong').then(updated=>{
+    if(updated)toast('Reported — thanks. Our moderation queue will take a look.');
+  });
+}
+
+/* ===== KIDS-FEED MODERATION QUEUE (VIDflow Studio) =====
+   Videos the AI classifier scored 60-79 (couldn't confidently decide),
+   or that picked up 3+ community reports, land here for a human call. */
+async function renderModQueue(){
+  const box=document.getElementById('mod-queue');
+  const queue=await apiGetModQueue();
+  if(!queue.length){box.style.display='none';return;}
+  box.style.display='block';
+  document.getElementById('mod-list').innerHTML=queue.map(v=>`
+    <div class="mod-row">
+      <div class="mod-title">${v.title}<br><span class="mod-score">AI confidence: ${v.aiKids?v.aiKids.score:'?'}/100 · uploader chose "${v.audience==='kids'?'For Kids':'General'}"${v.reports&&v.reports.length?' · '+v.reports.length+' report(s)':''}</span></div>
+      <button class="mod-btn mod-approve" onclick="moderateVideo('${v.id}',true)">Approve for Kids</button>
+      <button class="mod-btn mod-reject" onclick="moderateVideo('${v.id}',false)">Keep General</button>
+    </div>`).join('');
+}
+async function moderateVideo(id,approve){
+  const updated=await apiModerate(id,approve);
+  if(!updated)return;
+  const local=videos.find(x=>x.id===id);
+  if(local){local.aiKids=updated.aiKids;local.feed=updated.feed;}
+  toast(approve?'Approved for the Kids Feed.':'Kept in the General feed.');
+  renderModQueue();
+}
+
+/* Deleting is uploader-only and only available from VIDflow Studio now. */
+function deleteVideo(id){
+  const v=videos.find(x=>x.id===id);
+  if(!v)return;
+  if(!isOwner(v)){toast("Only the uploader can delete this video.");return;}
+  if(!confirm('Delete "'+v.title+'"? This cannot be undone.'))return;
+  if(id===currentId){
+    document.getElementById('main-vid').pause();
+    document.getElementById('main-vid').src='';
+  }
+  videos=videos.filter(x=>x.id!==id);
+  watchHistory=watchHistory.filter(x=>x!==id);
+  apiDeleteVideo(id);
+  if(id===currentId){currentId=null;goHome();}
+  toast('Video deleted.');
+  openStudio();
+}
+
+/* ===== HOME / NAV with background play -> mini player / PiP ===== */
+async function goHome(){
+  const vid=document.getElementById('main-vid');
+  const wasOnWatch=document.getElementById('pv').classList.contains('on');
+  if(wasOnWatch && currentId && !vid.paused && !vid.ended){
+    try{
+      if(document.pictureInPictureEnabled && !document.pictureInPictureElement){
+        await vid.requestPictureInPicture();
+        toast('Playing in Picture-in-Picture');
+      }
+    }catch(e){
+      startMiniPlayer();
+    }
+  } else {
+    if(vid.duration)recordProgress(currentId,vid.currentTime,vid.duration);
+    vid.pause();vid.src='';
+  }
+  document.getElementById('pv').classList.remove('on');
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('wrap').classList.remove('watching');
+  catFilter='All';
+  sidebarMode='recent';
+  setKidsMode(false);
+  renderAll();
+}
+
+function startMiniPlayer(){
+  const v=videos.find(x=>x.id===currentId);
+  if(!v)return;
+  const mainVid=document.getElementById('main-vid');
+  if(mainVid.duration)recordProgress(currentId,mainVid.currentTime,mainVid.duration);
+  const mini=document.getElementById('mini-vid');
+  mini.src=v.url;
+  mini.currentTime=mainVid.currentTime||0;
+  mini.muted=false;
+  mini.play().catch(()=>{});
+  document.getElementById('mini-title').textContent=v.title;
+  document.getElementById('mini-player').classList.add('show');
+  miniActive=true;
+  mainVid.pause();mainVid.src='';
+}
+function closeMiniPlayer(silent){
+  const mini=document.getElementById('mini-vid');
+  if(miniActive){mini.pause();mini.src='';document.getElementById('mini-player').classList.remove('show');miniActive=false;}
+  if(document.pictureInPictureElement){document.exitPictureInPicture().catch(()=>{});}
+  if(!silent)toast('Background playback stopped.');
+}
+document.getElementById('mini-vid').addEventListener('click',()=>{ if(currentId) openVideo(currentId,{fromNav:true}); });
+window.addEventListener('beforeunload',()=>{
+  const vid=document.getElementById('main-vid');
+  if(currentId&&vid&&vid.duration)recordProgress(currentId,vid.currentTime,vid.duration);
+});
+
+async function setCat(cat,el){
+  const player=document.getElementById('pv');
+  const isWatching=player && player.classList.contains('on');
+  const wasOnHome=!isWatching &&
+    document.getElementById('home-view').style.display==='block' &&
+    document.getElementById('has-content').style.display==='block';
+  if(!wasOnHome && !isWatching){
+    await goHome();
+  }
+  setKidsMode(false);
+  catFilter=cat;
+  sidebarMode='recent';
+  renderSidebar();
+  document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));
+  if(el){el.classList.add('active');}
+  else{
+    const match=[...document.querySelectorAll('.cat')].find(x=>x.textContent.trim()===cat);
+    if(match)match.classList.add('active');
+    setActiveSidebar(cat==='Movies'?'sl-movies':cat==='Music'?'sl-music':'sl-home');
+  }
+  showHomeMode();
+}
+
+function doSearch(){
+  const q=document.getElementById('srch').value.trim().toLowerCase();if(!q)return;
+  const scoped=kidsMode?kidsPool():generalPool();
+  const res=scoped.filter(v=>v.title.toLowerCase().includes(q)||v.cat.toLowerCase().includes(q));
+  document.getElementById('studio-view').style.display='none';
+  document.getElementById('pv').classList.remove('on');
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('has-content').style.display='block';
+  document.getElementById('shelves-wrap').style.display='none';
+  document.getElementById('grid-wrap').style.display='block';
+  document.getElementById('sec-title').textContent=`Results for "${q}" (${res.length})`;
+  renderGrid(res);
+}
+
+/* ===== VIDFLOW STUDIO ===== */
+function openStudio(){
+  document.getElementById('pv').classList.remove('on');
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('studio-view').style.display='block';
+  setActiveSidebar('');
+  renderStudioNumbers();
+  renderStudioTable();
+  renderModQueue();
+}
+
+function myStudioVideos(){
+  return videos.filter(v=>isOwner(v));
+}
+
+function renderStudioNumbers(){
+  const mine=myStudioVideos();
+  const totalViews=mine.reduce((a,v)=>a+v.views,0);
+  const totalLikes=mine.reduce((a,v)=>a+v.likes,0);
+  const totalComments=mine.reduce((a,v)=>a+(v.comments?v.comments.length:0),0);
+  document.getElementById('studio-stats').innerHTML=`
+    <div class="stat-card"><div class="sv">${fmtN(mine.length)}</div><div class="sl">Your Videos</div></div>
+    <div class="stat-card"><div class="sv">${fmtN(totalViews)}</div><div class="sl">Your Total Views</div></div>
+    <div class="stat-card"><div class="sv">${fmtN(totalLikes)}</div><div class="sl">Your Total Likes</div></div>
+    <div class="stat-card"><div class="sv">${fmtN(totalComments)}</div><div class="sl">Your Total Comments</div></div>
+    <div class="stat-card"><div class="sv">${fmtN(subbed.size)}</div><div class="sl">Subscriptions Made</div></div>
+  `;
+  const max=Math.max(1,...mine.map(v=>v.views));
+  document.getElementById('studio-chart').innerHTML=mine.length
+    ? mine.map(v=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="width:140px;font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title}</div>
+          <div style="flex:1;background:var(--bg4);border-radius:4px;height:14px;overflow:hidden;">
+            <div style="height:100%;width:${(v.views/max*100).toFixed(1)}%;background:linear-gradient(90deg,var(--blue2),var(--blue));box-shadow:0 0 8px var(--blue-glow);"></div>
+          </div>
+          <div style="width:46px;text-align:right;font-size:12px;color:var(--text2);">${fmtN(v.views)}</div>
+        </div>`).join('')
+    : `<div style="color:var(--text3);font-size:13px;">Upload a video to see your analytics.</div>`;
+}
+
+function renderStudioTable(){
+  const mine=myStudioVideos();
+  document.getElementById('studio-tbody').innerHTML=mine.length
+    ? mine.map(v=>`
+        <tr>
+          <td><div class="studio-vrow"><div class="studio-thumb">${v.thumb?`<img src="${v.thumb}">`:''}</div><div class="studio-vtitle">${v.title}</div></div></td>
+          <td>${fmtN(v.views)}</td>
+          <td>${fmtN(v.likes)}</td>
+          <td>${v.comments?v.comments.length:0}</td>
+          <td><span class="badge-q">${maxQualityLabel(v)}</span></td>
+          <td><span class="badge-q">${isSong(v)?'SONG':'LONG-FORM'}</span></td>
+          <td>${timeAgo(v.ts)}</td>
+          <td><button class="studio-del" onclick="deleteVideo('${v.id}')">&#128465; Delete</button></td>
+        </tr>`).join('')
+    : `<tr><td colspan="8" style="color:var(--text3);">You haven't uploaded any videos yet.</td></tr>`;
+}
+
+/* ===== UPLOAD with quality + chunked progress ===== */
+function openModal(){
+  if(guestBlock('Uploading videos')) return;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  uploadFile=null;
+  document.getElementById('drop-fname').textContent='';
+  document.getElementById('up-title').value='';
+  document.getElementById('up-desc').value='';
+  document.getElementById('up-cat').value='';
+  document.getElementById('prev-box').style.display='none';
+  document.getElementById('prev-vid').src='';
+  document.getElementById('prog-wrap').style.display='none';
+  document.getElementById('prog-bar').style.width='0';
+  document.getElementById('chunk-status').style.display='none';
+  document.getElementById('chunk-row').style.display='none';
+  document.getElementById('chunk-row').innerHTML='';
+  document.getElementById('btn-pub').disabled=true;
+  document.getElementById('btn-pub').textContent='Publish';
+  document.getElementById('finput').value='';
+  setQuality('low');
+  setAudience('general');
+}
+
+function setQuality(q){
+  uploadQuality=q;
+  document.getElementById('q-low').classList.toggle('sel',q==='low');
+  document.getElementById('q-high').classList.toggle('sel',q==='high');
+}
+
+function setAudience(a){
+  uploadAudience=a;
+  document.getElementById('aud-general').classList.toggle('sel',a==='general');
+  document.getElementById('aud-kids').classList.toggle('sel',a==='kids');
+}
+
+function pickFile(file){
+  if(!file||!file.type.startsWith('video/'))return;
+  uploadFile=file;
+  document.getElementById('drop-fname').textContent='✓ '+file.name+' ('+(file.size/1048576).toFixed(1)+' MB)';
+  if(!document.getElementById('up-title').value){
+    document.getElementById('up-title').value=file.name.replace(/\.[^/.]+$/,'').replace(/[_\-\.]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  }
+  const pv=document.getElementById('prev-vid');
+  const pb=document.getElementById('prev-box');
+  const objUrl=URL.createObjectURL(file);
+  pv.src=objUrl;
+  pb.style.display='block';
+  document.getElementById('btn-pub').disabled=false;
+}
+
+function onDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('video/'))pickFile(f);
+  else toast('Please drop a video file.');
+}
+
+function publishVideo(){
+  const title=document.getElementById('up-title').value.trim();
+  const cat=document.getElementById('up-cat').value;
+  if(!title){toast('Please enter a title.');return;}
+  if(!cat){toast('Please pick a category — it really helps recommendations.');return;}
+  if(!uploadFile){toast('Please select a video file.');return;}
+  const pub=document.getElementById('btn-pub');
+  pub.disabled=true;pub.textContent='Publishing…';
+
+  // Show fake progress bar animation
+  document.getElementById('prog-wrap').style.display='block';
+  document.getElementById('chunk-status').style.display='block';
+  const crow=document.getElementById('chunk-row');
+  crow.style.display='flex';
+  crow.innerHTML='';
+  const totalChunks=20;
+  for(let i=0;i<totalChunks;i++){
+    const cell=document.createElement('div');
+    cell.className='chunk-cell';
+    cell.id='chunk-'+i;
+    crow.appendChild(cell);
+  }
+  const bar=document.getElementById('prog-bar');
+  const status=document.getElementById('chunk-status');
+
+  // Animate progress bar visually
+  let fakePct=0;
+  const fakeInterval=setInterval(()=>{
+    fakePct=Math.min(fakePct+5,95);
+    bar.style.width=fakePct+'%';
+    const doneCells=Math.round(fakePct/100*totalChunks);
+    for(let i=0;i<totalChunks;i++){const c=document.getElementById('chunk-'+i);if(c)c.classList.toggle('done',i<doneCells);}
+    status.textContent='Processing video… ('+fakePct+'%)';
+  },80);
+
+  // Measure duration locally (just for the metadata field), then POST to server
+  const localUrl=URL.createObjectURL(uploadFile);
+  const tmp=document.createElement('video');
+  tmp.src=localUrl;tmp.preload='metadata';tmp.muted=true;
+
+  const doUpload=(dur)=>{
+    const fd=new FormData();
+    fd.append('video',uploadFile);
+    fd.append('title',title);
+    fd.append('desc',document.getElementById('up-desc').value);
+    fd.append('cat',cat);
+    fd.append('audience',uploadAudience);
+    fd.append('dur',dur);
+    fd.append('type','normal');
+    fd.append('uploaderEmail',currentUser?currentUser.email:'unknown');
+    fd.append('uploaderName',currentUser?currentUser.name:'Unknown');
+
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST','/api/videos');
+
+    xhr.upload.addEventListener('progress',e=>{
+      if(!e.lengthComputable)return;
+      const pct=Math.round(e.loaded/e.total*100);
+      bar.style.width=pct+'%';
+      const doneCells=Math.round(pct/100*totalChunks);
+      for(let i=0;i<totalChunks;i++){const c=document.getElementById('chunk-'+i);if(c)c.classList.toggle('done',i<doneCells);}
+      status.textContent='Uploading… ('+pct+'%)';
+    });
+
+    xhr.addEventListener('load',()=>{
+      clearInterval(fakeInterval);
+      bar.style.width='100%';
+      for(let i=0;i<totalChunks;i++){const c=document.getElementById('chunk-'+i);if(c)c.classList.add('done');}
+      if(xhr.status===202||xhr.status===200){
+        let newV;
+        try{newV=JSON.parse(xhr.responseText);}catch(e){newV=null;}
+        const videoId=newV&&newV.id;
+        status.textContent='Processing with FFmpeg…';
+
+        // --- Real-time FFmpeg progress polling ---
+        let pollTimer=null;
+        let pollStart=Date.now();
+        let lastPct=0;
+        let lastPctTime=Date.now();
+        let staleCount=0;
+        const MAX_STALE=40; // ~60s of no movement before assuming finished
+
+        function fmtETA(secs){
+          if(!isFinite(secs)||secs<=0)return '';
+          if(secs<60)return 'about '+(Math.ceil(secs/5)*5)+' seconds';
+          return 'about '+(Math.ceil(secs/60))+' minute'+(secs>=120?'s':'');
+        }
+
+        function finishPolling(){
+          bar.style.width='100%';
+          status.textContent='✓ Video processing complete!';
+          setTimeout(()=>{
+            apiGetVideos().then(fresh=>{
+              if(Array.isArray(fresh)){
+                videos=fresh;
+                const player=document.getElementById('pv');
+                if(!player||!player.classList.contains('on'))renderAll();
+              }
+              const v=videos.find(x=>x.id===videoId);
+              closeModal();
+              if(v){toast((isSong(v)?'Song':'Video')+' published!');setTimeout(()=>openVideo(v.id,{fromNav:true}),400);}
+              else{toast('Video published!');}
+            }).catch(()=>{closeModal();toast('Upload complete — refreshing…');});
+          },1200);
+        }
+
+        function pollProgress(){
+          if(!videoId){finishPolling();return;}
+          fetch('/api/videos/'+videoId+'/progress')
+            .then(r=>r.json())
+            .then(p=>{
+              if(p.status==='complete'){
+                clearTimeout(pollTimer);
+                finishPolling();
+                return;
+              }
+              if(p.status==='error'){
+                clearTimeout(pollTimer);
+                bar.style.width='0';
+                status.textContent='FFmpeg error: '+(p.error||'unknown');
+                const pub=document.getElementById('btn-pub');
+                pub.disabled=false;pub.textContent='Publish';
+                return;
+              }
+              // Update progress bar
+              const pct=Math.max(0,Math.min(100,p.percent||0));
+              bar.style.width=pct+'%';
+
+              // Stale detection: if percent hasn't moved, count up
+              const now=Date.now();
+              if(pct>lastPct){lastPct=pct;lastPctTime=now;staleCount=0;}
+              else{staleCount++;}
+              if(staleCount>=MAX_STALE){clearTimeout(pollTimer);finishPolling();return;}
+
+              // ETA calculation
+              const elapsed=(now-pollStart)/1000;
+              const rate=pct/Math.max(elapsed,1);
+              const etaStr=fmtETA(rate>0?(100-pct)/rate:0);
+
+              // Status text: multi-line via newline (textarea-style; CSS will use white-space:pre-line)
+              let line='Processing with FFmpeg… '+pct+'%';
+              if(p.quality&&p.quality!=='starting'&&p.quality!=='finished'){
+                line+='\nProcessing quality: '+p.quality;
+              }
+              if(etaStr)line+='\nEstimated time remaining: '+etaStr;
+              status.textContent=line;
+
+              pollTimer=setTimeout(pollProgress,1500);
+            })
+            .catch(()=>{
+              // Network hiccup — keep trying
+              pollTimer=setTimeout(pollProgress,2000);
+            });
+        }
+
+        // Small delay so the server registers the ID before first poll
+        pollTimer=setTimeout(pollProgress,800);
+
+      } else {
+        clearInterval(fakeInterval);
+        const pub=document.getElementById('btn-pub');
+        pub.disabled=false;pub.textContent='Publish';
+        let msg='Upload failed ('+xhr.status+').';
+        try{const e=JSON.parse(xhr.responseText);if(e.error)msg=e.error;}catch(_){}
+        toast(msg);
+      }
+    });
+
+    xhr.addEventListener('error',()=>{
+      clearInterval(fakeInterval);
+      const pub=document.getElementById('btn-pub');
+      pub.disabled=false;pub.textContent='Publish';
+      toast('Network error — could not reach the server.');
+    });
+
+    xhr.send(fd);
+  };
+
+  tmp.addEventListener('loadedmetadata',function(){ doUpload(fmtDur(this.duration)); },{once:true});
+  tmp.addEventListener('error',function(){ doUpload('0:00'); },{once:true});
+  tmp.load();
+}
+
+function toast(msg){
+  const el=document.getElementById('toast-el');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+function openMyProfile(){
+  window.location.href =
+  "/profile.html?user=" + encodeURIComponent(currentUser.email);
+}
+
+function openUploaderProfile(){
+  const v = videos.find(x => x.id === currentId);
+  if(!v || !v.uploaderEmail) return;
+
+  window.location.href =
+  "/profile.html?user=" + encodeURIComponent(v.uploaderEmail);
+}
+
+/* =====================================================================
+   MOMENTS — full client-side implementation
+   ===================================================================== */
+
+// Runtime state
+let momentsData = [];          // active moments returned by the server
+let seenMoments = new Set();   // ids the user has viewed this session
+let mvIndex = 0;               // current index inside mvQueue
+let mvQueue = [];              // ordered list of moments for the viewer
+let mvTimer = null;            // auto-advance timer id
+let mvStartTime = null;        // when the current moment started (for progress bar)
+let mvDuration = 0;            // seconds to show current moment
+let mvPaused = false;          // true while user holds down (video pause)
+let momentFile = null;         // selected file for create modal
+
+const PHOTO_DURATION = 5;      // seconds a photo displays before auto-advancing
+
+// ── Seen-state persistence (localStorage, per account) ────────────────
+function seenKey(){ return 'vf_seen_moments_' + (currentUser ? currentUser.email : 'guest'); }
+function loadSeenMoments(){
+  try { seenMoments = new Set(JSON.parse(localStorage.getItem(seenKey())) || []); }
+  catch(_){ seenMoments = new Set(); }
+}
+function persistSeenMoments(){
+  try { localStorage.setItem(seenKey(), JSON.stringify([...seenMoments])); } catch(_){}
+}
+function markMomentSeen(id){
+  seenMoments.add(id);
+  persistSeenMoments();
+}
+
+// ── API helpers ────────────────────────────────────────────────────────
+async function apiFetchMoments(){
+  if(!currentUser) return [];
+  try {
+    const r = await fetch('/api/moments?userEmail=' + encodeURIComponent(currentUser.email));
+    if(!r.ok) return [];
+    return r.json();
+  } catch(_){ return []; }
+}
+async function apiPostMomentView(id){
+  if(!currentUser) return;
+  try {
+    await fetch('/api/moments/' + id + '/view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewerEmail: currentUser.email })
+    });
+  } catch(_){}
+}
+async function apiDeleteMoment(id){
+  if(!currentUser) return;
+  try {
+    await fetch('/api/moments/' + id + '?ownerEmail=' + encodeURIComponent(currentUser.email), {
+      method: 'DELETE'
+    });
+  } catch(_){}
+}
+
+// ── Load & render the strip ────────────────────────────────────────────
+async function loadAndRenderMoments(){
+  if(!currentUser) return;
+  loadSeenMoments();
+  momentsData = await apiFetchMoments();
+  renderMomentsStrip();
+}
+
+function renderMomentsStrip(){
+  const strip = document.getElementById('moments-strip');
+  const row   = document.getElementById('moments-row');
+  if(!strip || !row) return;
+
+  // Discard any null/undefined/id-less entries before rendering
+  const validMoments = momentsData.filter(m => m && m.id);
+
+  // Build the bubble list: "Your Moment" always first, then others
+  const myEmail  = currentUser && currentUser.email;
+  const myMoment = validMoments.find(m => m.ownerEmail === myEmail);
+  const others   = validMoments.filter(m => m.ownerEmail !== myEmail);
+
+  // Own bubble
+  let html = buildOwnBubble(myMoment);
+
+  // Other-people bubbles
+  others.forEach(m => { html += buildOtherBubble(m); });
+
+  row.innerHTML = html;
+
+  // Show/hide the strip
+  // Always show the strip if the user is logged in (so they can add a Moment
+  // even when no one else has one yet).
+  if(currentUser){
+    strip.classList.add('visible');
+  }
+}
+
+function buildOwnBubble(moment){
+  const hasActive = !!moment;
+  const ringClass = hasActive ? 'own' : 'add-new';
+  const innerContent = buildAvatarInner(currentUser);
+  const label = '<div class="moment-name own-label">Your Moment</div>';
+  const onclick = hasActive
+    ? `openMomentViewer([${JSON.stringify(moment)}.id], 0)` // open own moment
+    : `openMomentCreate()`;
+
+  // For the own bubble with an active moment, clicking opens the viewer
+  if(hasActive){
+    return `
+      <div class="moment-bubble" onclick="openMomentViewerForMoment('${moment.id}')">
+        <div class="moment-ring own">
+          <div class="moment-inner">${innerContent}</div>
+        </div>
+        ${label}
+      </div>`;
+  }
+  // No active moment — show add-new
+  return `
+    <div class="moment-bubble" onclick="openMomentCreate()">
+      <div class="moment-ring add-new">
+        <div class="moment-inner" style="background:var(--bg3);">
+          <div class="moment-add-icon">+</div>
+        </div>
+      </div>
+      ${label}
+    </div>`;
+}
+
+function buildOtherBubble(m){
+  const seen = seenMoments.has(m.id);
+  const ringClass = seen ? 'seen' : 'unseen';
+  const innerContent = buildMomentAvatarInner(m);
+  const safeName = (m.ownerName || '').replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+  const displayName = (m.ownerName || 'Unknown').split(' ')[0]; // first name only
+  return `
+    <div class="moment-bubble" onclick="openMomentViewerForMoment('${m.id}')">
+      <div class="moment-ring ${ringClass}">
+        <div class="moment-inner">${innerContent}</div>
+      </div>
+      <div class="moment-name">${escHtml(displayName)}</div>
+    </div>`;
+}
+
+function buildAvatarInner(user){
+  if(user && user.photoURL){
+    return `<img src="${escHtml(user.photoURL)}" alt="">`;
+  }
+  return escHtml(user ? user.initials : 'V');
+}
+
+function buildMomentAvatarInner(m){
+  if(m.ownerAvatar){
+    return `<img src="${escHtml(m.ownerAvatar)}" alt="">`;
+  }
+  return escHtml(initials(m.ownerName || '?'));
+}
+
+function escHtml(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+// ── Create Modal ───────────────────────────────────────────────────────
+function openMomentCreate(){
+  if(!currentUser){ toast('Sign in to share a Moment.'); return; }
+  document.getElementById('moment-create-overlay').classList.add('open');
+  resetMomentCreateModal();
+}
+function closeMomentCreate(){
+  document.getElementById('moment-create-overlay').classList.remove('open');
+  momentFile = null;
+}
+function resetMomentCreateModal(){
+  momentFile = null;
+  document.getElementById('moment-file-input').value = '';
+  document.getElementById('moment-drop').style.display = 'block';
+  document.getElementById('moment-preview-wrap').style.display = 'none';
+  document.getElementById('moment-preview-img').style.display = 'none';
+  document.getElementById('moment-preview-img').src = '';
+  const vid = document.getElementById('moment-preview-vid');
+  vid.pause(); vid.src = ''; vid.style.display = 'none';
+  document.getElementById('moment-share-btn').disabled = true;
+  document.getElementById('moment-upload-status').textContent = '';
+}
+
+function onMomentDrop(e){
+  e.preventDefault();
+  document.getElementById('moment-drop').classList.remove('over');
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(file) onMomentFilePick(file);
+}
+function onMomentFilePick(file){
+  if(!file) return;
+  momentFile = file;
+  showMomentPreview(file);
+}
+
+function showMomentPreview(file){
+  const isVideo = file.type.startsWith('video/');
+  const wrap = document.getElementById('moment-preview-wrap');
+  const img  = document.getElementById('moment-preview-img');
+  const vid  = document.getElementById('moment-preview-vid');
+  const drop = document.getElementById('moment-drop');
+
+  drop.style.display = 'none';
+  wrap.style.display = 'block';
+  img.style.display  = 'none';
+  vid.style.display  = 'none';
+
+  const url = URL.createObjectURL(file);
+  if(isVideo){
+    vid.src = url; vid.style.display = 'block'; vid.play().catch(()=>{});
+  } else {
+    img.src = url; img.style.display = 'block';
+  }
+  document.getElementById('moment-share-btn').disabled = false;
+}
+
+async function shareMoment(){
+  if(!momentFile || !currentUser) return;
+
+  const btn    = document.getElementById('moment-share-btn');
+  const status = document.getElementById('moment-upload-status');
+  btn.disabled = true;
+  status.textContent = 'Uploading…';
+
+  const fd = new FormData();
+  fd.append('media', momentFile);
+  fd.append('ownerEmail', currentUser.email);
+
+  try {
+    const r = await fetch('/api/moments', { method: 'POST', body: fd });
+    const data = await r.json();
+    if(!r.ok){
+      status.textContent = data.error || 'Upload failed.';
+      btn.disabled = false;
+      return;
+    }
+    status.textContent = '✓ Moment shared!';
+    setTimeout(()=>{
+      closeMomentCreate();
+      // Remove any existing Moment for this user (server already replaced it),
+      // then prepend the fresh one — guarantees exactly one entry in momentsData.
+      momentsData = [data, ...momentsData.filter(m => m && m.id && m.ownerEmail !== currentUser.email)];
+      renderMomentsStrip();
+      toast('Your Moment is live for 24 hours! ✨');
+    }, 600);
+  } catch(err){
+    status.textContent = 'Network error — please try again.';
+    btn.disabled = false;
+  }
+}
+
+// ── Viewer ─────────────────────────────────────────────────────────────
+
+// Open viewer starting at the Moment that was clicked
+function openMomentViewerForMoment(id){
+  // Work from a clean, valid list — no undefined/null entries
+  const valid = momentsData.filter(m => m && m.id);
+  const idx = valid.findIndex(m => m.id === id);
+  if(idx < 0) return;
+  // Queue: clicked moment first, then the rest that follow (wrap-around)
+  const before = valid.slice(0, idx);
+  const from   = valid.slice(idx);
+  mvQueue = [...from, ...before];
+  mvIndex = 0;
+  openMomentViewerAt(0);
+}
+
+function openMomentViewerAt(i){
+  const overlay = document.getElementById('moment-viewer-overlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  mvIndex = i;
+  buildViewerProgressBars();   // build segments FIRST so fill els exist
+  renderMomentViewerSlide();   // then animate the first fill
+  setupViewerSwipeClose();
+}
+
+function closeMomentViewer(){
+  const overlay = document.getElementById('moment-viewer-overlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  clearMvTimer();
+  const vid = document.getElementById('mv-vid');
+  vid.pause(); vid.src = '';
+  mvQueue = []; mvIndex = 0;
+}
+
+function buildViewerProgressBars(){
+  const row = document.getElementById('mv-progress-row');
+  row.innerHTML = mvQueue.map((_,i) =>
+    `<div class="mv-prog-seg"><div class="mv-prog-fill" id="mv-fill-${i}"></div></div>`
+  ).join('');
+}
+
+function renderMomentViewerSlide(){
+  clearMvTimer();
+  const m = mvQueue[mvIndex];
+  if(!m){ closeMomentViewer(); return; }
+
+  // Mark as seen
+  markMomentSeen(m.id);
+
+  // Record view on server (non-blocking)
+  if(currentUser && m.ownerEmail !== currentUser.email){
+    apiPostMomentView(m.id);
+  }
+
+  // Header
+  const avEl = document.getElementById('mv-av');
+  if(m.ownerAvatar){
+    avEl.innerHTML = `<img src="${escHtml(m.ownerAvatar)}" alt="">`;
+  } else {
+    avEl.textContent = initials(m.ownerName || '?');
+  }
+  document.getElementById('mv-name').textContent = m.ownerName || 'Unknown';
+  document.getElementById('mv-time').textContent = timeAgo(m.createdAt);
+
+  // Footer (viewer count only visible to owner)
+  const footerEl = document.getElementById('mv-views');
+  const isOwner  = currentUser && m.ownerEmail === currentUser.email;
+  if(isOwner){
+    const count = m.viewers ? m.viewers.length : 0;
+    footerEl.innerHTML = `<span class="mv-views-icon">👁</span> ${count} viewer${count===1?'':'s'}`;
+  } else {
+    footerEl.innerHTML = '';
+  }
+
+  // Media
+  const img = document.getElementById('mv-img');
+  const vid = document.getElementById('mv-vid');
+  img.style.display = 'none';
+  vid.style.display = 'none';
+  vid.pause(); vid.src = '';
+
+  if(m.type === 'video'){
+    vid.src = m.url;
+    vid.style.display = 'block';
+    vid.currentTime = 0;
+    vid.play().catch(()=>{});
+    mvDuration = 0; // will be set from video metadata
+    vid.onloadedmetadata = () => {
+      mvDuration = vid.duration || 30;
+      startMvTimer(mvDuration);
+    };
+    vid.onended = () => mvNavigate(1);
+  } else {
+    img.src = m.url;
+    img.style.display = 'block';
+    mvDuration = PHOTO_DURATION;
+    startMvTimer(PHOTO_DURATION);
+  }
+
+  // Update progress fill for previous segments
+  for(let i = 0; i < mvQueue.length; i++){
+    const fill = document.getElementById('mv-fill-' + i);
+    if(!fill) continue;
+    if(i < mvIndex){
+      fill.style.width = '100%';
+      fill.style.transition = 'none';
+    } else if(i === mvIndex){
+      fill.style.width = '0%';
+      fill.style.transition = 'none';
+    } else {
+      fill.style.width = '0%';
+      fill.style.transition = 'none';
+    }
+  }
+}
+
+function startMvTimer(secs){
+  clearMvTimer();
+  mvStartTime = Date.now();
+  const fill = document.getElementById('mv-fill-' + mvIndex);
+  if(fill){
+    fill.style.transition = `width ${secs}s linear`;
+    // Force reflow to restart animation
+    void fill.offsetWidth;
+    fill.style.width = '100%';
+  }
+  mvTimer = setTimeout(()=>{ mvNavigate(1); }, secs * 1000);
+}
+
+function clearMvTimer(){
+  if(mvTimer){ clearTimeout(mvTimer); mvTimer = null; }
+  const fill = document.getElementById('mv-fill-' + mvIndex);
+  if(fill){ fill.style.transition = 'none'; }
+}
+
+function mvNavigate(dir){
+  const next = mvIndex + dir;
+  if(next < 0 || next >= mvQueue.length){
+    closeMomentViewer();
+    // Re-render the strip so ring states update
+    renderMomentsStrip();
+    return;
+  }
+  mvIndex = next;
+  renderMomentViewerSlide();
+}
+
+// Swipe-down to close
+function setupViewerSwipeClose(){
+  const overlay = document.getElementById('moment-viewer-overlay');
+  let startY = 0;
+  overlay.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  overlay.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    if(dy > 80) closeMomentViewer();
+  }, { passive: true });
+}
+
+// Keyboard nav for desktop
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('moment-viewer-overlay').classList.contains('open')) return;
+  if(e.key === 'Escape'   || e.key === 'ArrowDown')  closeMomentViewer();
+  if(e.key === 'ArrowRight')  mvNavigate(1);
+  if(e.key === 'ArrowLeft')   mvNavigate(-1);
+});
+
+// Hold to pause video
+(()=>{
+  const overlay = document.getElementById('moment-viewer-overlay');
+  function mvPauseStart(){
+    mvPaused = true;
+    const vid = document.getElementById('mv-vid');
+    if(vid && !vid.paused) vid.pause();
+    clearMvTimer();
+  }
+  function mvPauseEnd(){
+    if(!mvPaused) return;
+    mvPaused = false;
+    const vid = document.getElementById('mv-vid');
+    if(vid && vid.src) vid.play().catch(()=>{});
+    const remaining = mvDuration - (vid && vid.currentTime || 0);
+    if(remaining > 0) startMvTimer(remaining);
+    else mvNavigate(1);
+  }
+  overlay.addEventListener('mousedown', mvPauseStart);
+  overlay.addEventListener('mouseup',   mvPauseEnd);
+  overlay.addEventListener('touchstart',mvPauseStart, { passive:true });
+  overlay.addEventListener('touchend',  mvPauseEnd,   { passive:true });
+})();
+
+// ── Moments refresh on poll ────────────────────────────────────────────
+// The initial load is triggered from bootFromSession (see above).
+// pollForUpdates runs every 30 s; we piggyback the Moments refresh there
+// by overriding it here — this runs AFTER the original is declared.
+(function(){
+  const _orig = pollForUpdates;
+  pollForUpdates = async function(){
+    await _orig.apply(this, arguments);
+    if(currentUser) loadAndRenderMoments().catch(()=>{});
+  };
+})();
+</script>
+
+</body></html>
